@@ -23,4 +23,8 @@ public interface WorkPlaceService {
 
 	WorkPlace deleteWorkPlace(Long workPlaceId);
 
+	WorkPlace findByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate);
+
+	List<WorkPlace> findAllByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate);
+
 }

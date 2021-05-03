@@ -7,7 +7,11 @@ import java.util.Set;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
+import com.jesperapps.tracksupervisor.api.model.City;
+import com.jesperapps.tracksupervisor.api.model.Country;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
+import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
 import com.jesperapps.tracksupervisor.api.model.UserType;
 
@@ -23,6 +27,11 @@ public class UserRequestEntity {
 	private String status;
 	private String userStatus;
 	private String authenticationType;
+	private String address;
+	private String postalCode;
+	private State state;
+	private Country country;
+	private City city;
 	
 	private Long createdByUser;
 
@@ -95,6 +104,57 @@ public class UserRequestEntity {
 	
 	
 	
+
+	public UserRequestEntity(SecondaryUser each, User secondaryUser) {
+		this.userId = secondaryUser.getUserId();
+		this.userType = secondaryUser.getUserType();
+		this.createdByUser = secondaryUser.getCreatedByUser();
+		this.timeTracking  = secondaryUser.getTimeTracking();
+		this.organization = secondaryUser.getOrganization();
+		this.email = secondaryUser.getEmail();
+		this.name = secondaryUser.getName();
+		this.createdByUser = secondaryUser.getCreatedByUser();
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public City getCity() {
+		return city;
+	}
+
+	public void setCity(City city) {
+		this.city = city;
+	}
 
 	public String getPassword() {
 		return password;

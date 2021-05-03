@@ -8,4 +8,6 @@ public interface OrganizationRepository extends JpaRepository<Organization, Inte
 
 	Organization findByOrganizationName(String organizationName);
 
+	Organization findByOrganizationId(Integer organizationId);
+
 }

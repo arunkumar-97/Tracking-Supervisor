@@ -39,9 +39,7 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@Size(max = 100)
 	private String organizationName;
 
-	@Column(name = "INDUSTRY_TYPE")
-	@Size(max = 20)
-	private String industryType;
+	
 
 	@Column(name = "CONTACT_PERSON")
 	@Size(max = 11)
@@ -79,6 +77,10 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@Column(name = "REPORTING_CURRENCY ")
 	@Size(max = 150)
 	private String reportingCurrency;
+	
+	@Column(name = "GST_NO")
+	@Size(max = 150)
+	private String gstNumber;
 
 	@ManyToOne
 	@JoinColumn(name = "state_Id", referencedColumnName = "stateId")
@@ -93,7 +95,8 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	private City city;
 
 	@JsonManagedReference("organization_attachment")
-	@OneToOne(mappedBy = "organization")
+	@OneToOne(mappedBy = "organization", orphanRemoval = true,
+		    cascade = CascadeType.ALL)
 //	@JoinColumn(name = "attachment")
 	private Attachment attachment;
 	
@@ -104,6 +107,10 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@ManyToOne
 	@JoinColumn
 	private Status status;
+	
+	@ManyToOne
+	@JoinColumn(name = "industryType", referencedColumnName = "industryTypeId")
+	private IndustryType industryType;
 
 	public Organization() {
 
@@ -155,6 +162,7 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		this.fiscalYearStart = organizationRequestEntity.getFiscalYearStart();
 		this.defaulTimezone = organizationRequestEntity.getDefaulTimezone();
 		this.reportingCurrency = organizationRequestEntity.getReportingCurrency();
+		this.gstNumber=organizationRequestEntity.getGstNumber();
 		if (organizationRequestEntity.getAttachment() == null) {
 
 		} else {
@@ -196,6 +204,10 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		this.fiscalYearStart = organizationRequestEntity.getFiscalYearStart();
 		this.defaulTimezone = organizationRequestEntity.getDefaulTimezone();
 		this.reportingCurrency = organizationRequestEntity.getReportingCurrency();
+		this.gstNumber=organizationRequestEntity.getGstNumber();
+		this.country=organizationRequestEntity.getCountry();
+		this.state=organizationRequestEntity.getState();
+		this.city=organizationRequestEntity.getCity();
 		if (organizationRequestEntity.getAttachment() == null) {
 
 		} else {
@@ -220,11 +232,13 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		this.organizationName = organizationName;
 	}
 
-	public String getIndustryType() {
+	
+
+	public IndustryType getIndustryType() {
 		return industryType;
 	}
 
-	public void setIndustryType(String industryType) {
+	public void setIndustryType(IndustryType industryType) {
 		this.industryType = industryType;
 	}
 
@@ -346,6 +360,25 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public String getGstNumber() {
+		return gstNumber;
+	}
+
+	public void setGstNumber(String gstNumber) {
+		this.gstNumber = gstNumber;
+	}
+
+	@Override
+	public String toString() {
+		return "Organization [organizationId=" + organizationId + ", organizationName=" + organizationName
+				+ ", industryType=" + industryType + ", contactPerson=" + contactPerson + ", contactCountryCode="
+				+ contactCountryCode + ", contactPhoneNumber=" + contactPhoneNumber + ", contactEmail=" + contactEmail
+				+ ", address=" + address + ", postalCode=" + postalCode + ", fiscalYearStart=" + fiscalYearStart
+				+ ", defaulTimezone=" + defaulTimezone + ", reportingCurrency=" + reportingCurrency + ", gstNumber="
+				+ gstNumber + ", state=" + state + ", country=" + country + ", city=" + city + ", attachment="
+				+ attachment + ", user=" + user + ", status=" + status + "]";
 	}
 
 

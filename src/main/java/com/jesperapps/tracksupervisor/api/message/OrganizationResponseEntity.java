@@ -6,6 +6,7 @@ import com.jesperapps.tracksupervisor.api.extra.BaseResponse;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.IndustryType;
 import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.Status;
@@ -15,7 +16,7 @@ public class OrganizationResponseEntity extends BaseResponse{
 
 	private Integer organizationId;
 	private String organizationName;
-	private String industryType;
+	private IndustryType industryType;
 	private String contactPerson;
 	private String contactCountryCode;
 	private String contactPhoneNumber;
@@ -31,6 +32,7 @@ public class OrganizationResponseEntity extends BaseResponse{
 	private Attachment attachment;
 	private List<User> user;
 	private Status status;
+	private String gstNumber;
 	
 	public OrganizationResponseEntity() {
 		// TODO Auto-generated constructor stub
@@ -46,6 +48,16 @@ public class OrganizationResponseEntity extends BaseResponse{
 	}
 
 
+	public String getGstNumber() {
+		return gstNumber;
+	}
+
+
+	public void setGstNumber(String gstNumber) {
+		this.gstNumber = gstNumber;
+	}
+
+
 	public Integer getOrganizationId() {
 		return organizationId;
 	}
@@ -58,12 +70,17 @@ public class OrganizationResponseEntity extends BaseResponse{
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
 	}
-	public String getIndustryType() {
+	
+	public IndustryType getIndustryType() {
 		return industryType;
 	}
-	public void setIndustryType(String industryType) {
+
+
+	public void setIndustryType(IndustryType industryType) {
 		this.industryType = industryType;
 	}
+
+
 	public String getContactPerson() {
 		return contactPerson;
 	}

@@ -13,6 +13,12 @@ public class Country {
 	@Id
 	private Integer countryId;
 	private String countryName;
+	private String countryNiceName;
+	
+	private String iso;
+	private String iso3;
+	private Integer numCode;
+	private Integer phoneCode;
 	
 	
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "country")
@@ -20,6 +26,10 @@ public class Country {
 	
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "country")
 	private List<Organization> organization;
+	
+	@OneToMany(cascade = CascadeType.ALL,mappedBy = "country")
+	private List<User> user;
+	
 	
 	public Integer getCountryId() {
 		return countryId;
@@ -32,6 +42,37 @@ public class Country {
 	}
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
+	}
+	
+	public String getIso() {
+		return iso;
+	}
+	public void setIso(String iso) {
+		this.iso = iso;
+	}
+	public String getIso3() {
+		return iso3;
+	}
+	public void setIso3(String iso3) {
+		this.iso3 = iso3;
+	}
+	public Integer getNumCode() {
+		return numCode;
+	}
+	public void setNumCode(Integer numCode) {
+		this.numCode = numCode;
+	}
+	public Integer getPhoneCode() {
+		return phoneCode;
+	}
+	public void setPhoneCode(Integer phoneCode) {
+		this.phoneCode = phoneCode;
+	}
+	public String getCountryNiceName() {
+		return countryNiceName;
+	}
+	public void setCountryNiceName(String countryNiceName) {
+		this.countryNiceName = countryNiceName;
 	}
 	
 	

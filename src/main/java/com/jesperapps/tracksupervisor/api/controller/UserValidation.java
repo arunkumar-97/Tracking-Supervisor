@@ -78,6 +78,56 @@ public class UserValidation {
 	
 	
 
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	@PostMapping("/login/email")
+//	public ResponseEntity loginuser(@RequestBody UserRequestEntity adminRequest) {
+//
+//		User emailFromDb=userService.findUserByEmailOrPhoneNumber(adminRequest.getEmail(),adminRequest.getPhoneNumber());
+//		if(emailFromDb!=null) {
+//		
+//			if(userService.checkPasswordIsSame(adminRequest.getPassword(), emailFromDb.getPassword())) {
+////				if(emailFromDb.getVerificationStatus()==1) {
+//					User userFromDb=userService.findByEmailAndPassword(emailFromDb.getEmail(),emailFromDb.getPassword());
+////		     		System.out.println(userFromDb);	
+////		      		System.out.println("Login Successfull");	
+//					UserResponseEntity response=new UserResponseEntity(userFromDb,userFromDb);
+//						
+//						
+// 
+//					response.setStatusCode(200);
+//					response.setDescription("Login Successfull");
+//					return  new ResponseEntity(response, HttpStatus.OK);
+////				}else {
+////					UserResponseEntity response2=new UserResponseEntity();
+////					response2.setStatusCode(409);
+////					response2.setDescription("Please Verify to login");
+////					return new ResponseEntity(response2, HttpStatus.NOT_ACCEPTABLE);
+////				}
+//			
+//			}else {
+//				System.out.println("Password Invalid");	
+//				UserResponseEntity response1=new UserResponseEntity();
+//				response1.setStatusCode(409);
+//				response1.setDescription("Password Invalid");
+//				return new ResponseEntity(response1, HttpStatus.CONFLICT);
+//				
+//				
+//		}
+//
+//		
+//		
+//	}else {
+//		System.out.println("else email does");	
+//		UserResponseEntity response3=new UserResponseEntity();
+//		response3.setStatusCode(409);
+//		response3.setDescription("Email does not exists");
+//		 return new ResponseEntity(response3, HttpStatus.CONFLICT);
+//	}
+//		
+//	}
+	
+	
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PostMapping("/login/email")
 	public ResponseEntity loginuser(@RequestBody UserRequestEntity adminRequest) {
@@ -86,23 +136,23 @@ public class UserValidation {
 		if(emailFromDb!=null) {
 		
 			if(userService.checkPasswordIsSame(adminRequest.getPassword(), emailFromDb.getPassword())) {
-//				if(emailFromDb.getVerificationStatus()==1) {
-//					User userFromDb=userService.findByEmailAndPassword(emailFromDb.getEmail(),emailFromDb.getPassword());
+				if(emailFromDb.getVerificationStatus()==1) {
+					User userFromDb=userService.findByEmailAndPassword(emailFromDb.getEmail(),emailFromDb.getPassword());
 //		     		System.out.println(userFromDb);	
 //		      		System.out.println("Login Successfull");	
-					UserResponseEntity response=new UserResponseEntity();
+					UserResponseEntity response=new UserResponseEntity(userFromDb,userFromDb);
 						
 						
- 
+
 					response.setStatusCode(200);
 					response.setDescription("Login Successfull");
 					return  new ResponseEntity(response, HttpStatus.OK);
-//				}else {
-//					UserResponseEntity response2=new UserResponseEntity();
-//					response2.setStatusCode(409);
-//					response2.setDescription("Please Verify to login");
-//					return new ResponseEntity(response2, HttpStatus.NOT_ACCEPTABLE);
-//				}
+				}else {
+					UserResponseEntity response2=new UserResponseEntity();
+					response2.setStatusCode(409);
+					response2.setDescription("Please Verify to login");
+					return new ResponseEntity(response2, HttpStatus.NOT_ACCEPTABLE);
+				}
 			
 			}else {
 				System.out.println("Password Invalid");	
@@ -123,6 +173,8 @@ public class UserValidation {
 		response3.setDescription("Email does not exists");
 		 return new ResponseEntity(response3, HttpStatus.CONFLICT);
 	}
+//		return new ResponseEntity(response2, HttpStatus.CONFLICT);
 		
 	}
+
 }

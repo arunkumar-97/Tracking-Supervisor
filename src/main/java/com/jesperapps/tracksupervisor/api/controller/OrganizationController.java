@@ -1,8 +1,16 @@
 package com.jesperapps.tracksupervisor.api.controller;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,20 +33,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 //import com.jesperapps.schoolmanagement.api.message.Response;
 //import com.jesperapps.schoolmanagement.api.message.SchoolRequest;
 //import com.jesperapps.schoolmanagement.api.model.School;
-import com.jesperapps.tracksupervisor.api.entity.UserResEntity;
-import com.jesperapps.tracksupervisor.api.message.OrganizataionWithUserRequestEntity;
+
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationResponseEntity;
-import com.jesperapps.tracksupervisor.api.message.OrganizationWithUserResponseEntity;
-import com.jesperapps.tracksupervisor.api.message.TimeTrackingResponseEntity;
+import com.jesperapps.tracksupervisor.api.message.UserResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.AttachmentByte;
 import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.Status;
-import com.jesperapps.tracksupervisor.api.model.TimeTracking;
 import com.jesperapps.tracksupervisor.api.model.User;
+import com.jesperapps.tracksupervisor.api.model.UserType;
 import com.jesperapps.tracksupervisor.api.service.AttachmentService;
+import com.jesperapps.tracksupervisor.api.service.EmailService;
 import com.jesperapps.tracksupervisor.api.service.OrganizationService;
+import com.jesperapps.tracksupervisor.api.service.OtpSmsService;
 import com.jesperapps.tracksupervisor.api.service.UserService;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -48,14 +56,20 @@ public class OrganizationController {
 	@Autowired
 	private OrganizationService organizationService;
 	
+	@Autowired
+	private EmailService emailservice;
 	
 	@Autowired
 	private AttachmentService attachmentService;
 	
 	@Autowired
 	private UserService userService;
+	
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private OtpSmsService otpService;
 
 	private Logger logger = LoggerFactory.getLogger("OrganizationController");
 	OrganizationResponseEntity res = new OrganizationResponseEntity();
@@ -108,68 +122,205 @@ public class OrganizationController {
 	@SuppressWarnings("rawtypes")
 	@PostMapping("/organization/user/registration")
 	private ResponseEntity createEmployee(@RequestBody OrganizationRequestEntity organizationRequestEntity) {
+		Organization organizationFromDb	=organizationService.findByOrganizationName(organizationRequestEntity.getOrganizationName());
 //		System.out.println(employeeRequest.getEmpoyeeId());
-		Organization createdOrganization=organizationService.addOrganization(organizationRequestEntity);
-		if(createdOrganization != null) {
-			
-                     Organization organization = new Organization(createdOrganization.getOrganizationId());
-			List<User>	newUser=organizationRequestEntity.getUser();
-			System.out.println("user"  + organizationRequestEntity.getUser());
-			for(User eachUser:newUser) {
-				User user = new User(eachUser,eachUser,organizationRequestEntity);
-				user.setOrganization(organization);
-				if(organizationRequestEntity.getAttachment() == null) {
-					
-				}else {
-					System.out.println("Attachment" + user.getAttachment());
-					Attachment att = user.getAttachment();
-					if(att != null) {
-						AttachmentByte attachmentByte=att.getAttachmentByte();
-						if(attachmentByte !=null) {
-							attachmentByte.setAttachment(att);
-//							att.setAttachmentByte(attachmentByte);
-						}
-						organization.setAttachment(att);
-//						att.setOrganization(organization);
-//						att.setAttachmentByte(att.getAttachmentByte());
-					Attachment		attachment=attachmentService.save(att);
-					System.out.println("Not Null" + attachment);
-					if (attachment != null) {
-						String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
-								.path(attachment.getAttachmentId().toString()).toUriString();
+		if(organizationFromDb == null) {
 
-						String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
-								.path(attachment.getAttachmentId().toString()).toUriString();
-						attachment.setFileDownloadUrl(fileDownloadUrl);
-						attachment.setFileViewUrl(fileViewUrl);
-						attachmentService.save(attachment);
-					}
+				List<User>	newUser=organizationRequestEntity.getUser();
+				
+				System.out.println("user"  + organizationRequestEntity.getUser());
+				for(User eachUser:newUser) {
+					
+//				List<User> user1=userService.findAllByPhoneNumberOrEmail(eachUser.getPhoneNumber(),eachUser.getEmail());
+//					if(user1== null) {
+					
+				List<User> emailFromDb=		userService.findAllByEmail(eachUser.getEmail());
+				if(emailFromDb.isEmpty()) {
+					
+					List<User> numberFromDb=userService.findAllByPhoneNumber(eachUser.getPhoneNumber());
+					
+					if(numberFromDb.isEmpty()){
 						
-					}
-//					organization.setAttachment(att);
-//					att.setOrganization(organization);
-//						attachmentService.save(att);
+					}else{
+						UserResponseEntity userResEntity = new UserResponseEntity();
+						userResEntity.setErrorCode(409);
+						userResEntity.setMessage("Phone Number Already Exists");
+						return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
 					
-					//userService.save(user);
-		//
-//					} else {
-//						organizationService.save(organization);
-//					}
+					}
+				}else {
+					UserResponseEntity userResEntity = new UserResponseEntity();
+					userResEntity.setErrorCode(409);
+					userResEntity.setMessage("Email Already Exists");
+					return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
+				
+					
 				}
-				//userService.save(user);
+				
+				
+				
+				Organization createdOrganization=organizationService.addOrganization(organizationRequestEntity);
+				if(createdOrganization != null) {
+					
+					Organization organization = new Organization(createdOrganization.getOrganizationId());
+					
+					
+					User user = new User(eachUser,eachUser,organizationRequestEntity);
+					Set<UserType> userType=new HashSet<>();
+					UserType uType=new UserType();
+					uType.setUserTypeId((long) 1);
+					userType.add(uType);
+					user.setUserType(userType);
+					
+					int otp = otpService.generateOTP(eachUser.getPhoneNumber());
+					if (otp == 0) {
+					} else {
+						if (user.getAuthenticationType().equalsIgnoreCase("sms")) {
+							sendSms("Your One Time Password(OTP) is " + otp, user.getPhoneNumber());
 
+						} else if (user.getAuthenticationType().equalsIgnoreCase("email")) {
+							
+							
+							emailservice.sendOTPMail(user);
 			
+						}
+					}
+//					int otp = otpService.generateOTP(user.getPhoneNumber());
+//					if (otp == 0) {
+//					} else {
+//						if (eachUser.getAuthenticationType().equalsIgnoreCase("sms")) {
+//							sendSms("Your One Time Password(OTP) is " + otp, user.getPhoneNumber());
+	//
+////						} else if (userRequestEntity.getAuthenticationType().equalsIgnoreCase("Email")) {
+////							emailService.sendOTPMail(newUsersList);
+//			//
+////						}
+//					}
+//					
+//					}
+					System.out.println("Organization " +organization.getOrganizationId());
+					user.setOrganization(organization);
+					if(organizationRequestEntity.getAttachment() == null) {
+						userService.save(user);
+					}else {
+						System.out.println("Attachment" + user.getAttachment());
+						Attachment att = user.getAttachment();
+						if(att != null) {
+							AttachmentByte attachmentByte=att.getAttachmentByte();
+							if(attachmentByte !=null) {
+								System.out.println("Attachment" + attachmentByte.getAttachment());
+								attachmentByte.setAttachment(att);
+//								att.setAttachmentByte(attachmentByte);
+							}
+							organization.setAttachment(att);
+//							att.setOrganization(organization);
+//							att.setAttachmentByte(att.getAttachmentByte());
+						Attachment		attachment=attachmentService.save(att);
+						System.out.println("Not Null" + attachment);
+						if (attachment != null) {
+							String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
+									.path(attachment.getAttachmentId().toString()).toUriString();
+
+							String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
+									.path(attachment.getAttachmentId().toString()).toUriString();
+							attachment.setFileDownloadUrl(fileDownloadUrl);
+							attachment.setFileViewUrl(fileViewUrl);
+							attachmentService.save(attachment);
+						}
+							
+						}
+//						organization.setAttachment(att);
+//						att.setOrganization(organization);
+//							attachmentService.save(att);
+						
+						//userService.save(user);
+			//
+//						} else {
+//							organizationService.save(organization);
+//						}
+					}
+					}
+		                     
+						
+						
+//					}else {
+//						UserResponseEntity userResEntity=new UserResponseEntity();
+//						userResEntity.setErrorCode(409);
+//						userResEntity.setMessage("User Already Exists");
+//						return new ResponseEntity(userResEntity, HttpStatus.NOT_FOUND);
+//					}
+					
+				
+					//userService.save(user);
+
+				
+				}
+				OrganizationResponseEntity userResEntity = new OrganizationResponseEntity();
+				userResEntity.setErrorCode(200);
+				userResEntity.setMessage("Organization Created Successfully");
+				return new ResponseEntity(userResEntity, HttpStatus.OK);
+				
+				
+			}else {
+				OrganizationResponseEntity userResEntity = new OrganizationResponseEntity();
+				userResEntity.setErrorCode(200);
+				userResEntity.setMessage("Organization Already Exists");
+				return new ResponseEntity(userResEntity, HttpStatus.OK);
+		
 			}
 			
-			
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(new OrganizationResponseEntity(createdOrganization));
-		}else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new OrganizationResponseEntity() );
-	
 		}
-		
-	}
+
 	
+	private void sendSms(String string, String phoneNumber) {
+		try {
+
+			String apiKey = "elNIWdPL4TVuhKAGt7BnjMoEw9ZFyYU6cXx5kg2J8zHaiOs01Dn50wUgxpFkDubhRT9Ba87Ny6vlMtWr";
+			String sendId = "FSTSMS";
+			// important step...
+			string = URLEncoder.encode(string, "UTF-8");
+			String language = "english";
+
+			String route = "t";
+
+			String myUrl = "https://www.fast2sms.com/dev/bulk?authorization=" + apiKey + "&sender_id=" + sendId
+					+ "&message=" + string + "&language=" + language + "&route=" + route + "&numbers=" + phoneNumber;
+
+			// sending get request using java..
+
+			URL url = new URL(myUrl);
+
+			HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+
+			con.setRequestMethod("GET");
+
+			con.setRequestProperty("User-Agent", "Mozilla/5.0");
+			con.setRequestProperty("cache-control", "no-cache");
+			System.out.println("Wait..............");
+
+			int code = con.getResponseCode();
+
+			System.out.println("Response code : " + code);
+
+			StringBuffer response = new StringBuffer();
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+			while (true) {
+				String line = br.readLine();
+				if (line == null) {
+					break;
+				}
+				response.append(line);
+			}
+
+			System.out.println(response);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 	
 //	@PostMapping("/organization/user/registration")
 //	public ResponseEntity createSchool(@RequestBody OrganizataionWithUserRequestEntity orgRequest) {

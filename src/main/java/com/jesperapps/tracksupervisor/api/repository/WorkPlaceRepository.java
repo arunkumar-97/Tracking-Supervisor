@@ -18,4 +18,8 @@ public interface WorkPlaceRepository extends JpaRepository<WorkPlace, Long>{
 
 	WorkPlace findByFromDateIsBetween(Date fromDate, Date toDate);
 
+	WorkPlace findByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate);
+
+	List<WorkPlace> findAllByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate);
+
 }

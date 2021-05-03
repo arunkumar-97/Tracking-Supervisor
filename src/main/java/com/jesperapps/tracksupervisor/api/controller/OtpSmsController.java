@@ -109,8 +109,13 @@ public class OtpSmsController {
 		if (phone.isPresent()) {
 //			phone.get().setOtpVerification("Verified");
 			@SuppressWarnings("unused")
-		User user = userRegistrationService.save(phone.get());
-//			user.setVerificationStatus(1);
+//		User user = userRegistrationService.save(phone.get());
+////			user.setVerificationStatus(1);
+//			userRegistrationService.save(user);
+			
+			
+			User user = userRegistrationService.save(phone.get());
+			user.setVerificationStatus(1);
 			userRegistrationService.save(user);
 //			UserResponseEntity userResponseEntity = new UserResponseEntity(user, user, user);
 //			userResponseEntity.setStatusCode(res.SUCCESS);

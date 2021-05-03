@@ -20,6 +20,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import com.jesperapps.tracksupervisor.api.extra.AbstractAuditingEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.UserRequestEntity;
@@ -27,6 +28,16 @@ import com.jesperapps.tracksupervisor.api.message.UserRequestEntity;
 @Entity
 @Table(name = "user")
 public class User extends AbstractAuditingEntity implements Serializable {
+
+	
+
+	public ConfirmationToken getOtpToken() {
+		return otpToken;
+	}
+
+	public void setOtpToken(ConfirmationToken otpToken) {
+		this.otpToken = otpToken;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,9 +51,21 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	private String status;
 	private String userStatus;
 	private String authenticationType;
+	private String address;
+	private String postalCode;
+	private int verificationStatus;
 	
 	@Column(columnDefinition = "bigint(20)")
 	private Long createdByUser;
+//	
+//	@OneToOne(mappedBy="user", cascade=CascadeType.ALL)
+//	private ConfirmationToken otpToken;
+//	
+	
+	@OneToOne(mappedBy = "user", orphanRemoval = true,
+		    cascade = CascadeType.ALL)
+	private ConfirmationToken otpToken;
+	
 
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -55,37 +78,58 @@ public class User extends AbstractAuditingEntity implements Serializable {
     cascade = CascadeType.ALL)
 	private Attachment attachment;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private Set<Attendance> attendance;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "assignedFromUser")
 	private List<WorkPlace> workPlace;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "secondaryUser")
 	private Set<SecondaryUser> SecondaryUser;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "primaryUser")
 	private Set<SecondaryUser> primaryUser;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "assignedToUser")
 	private List<WorkPlace> workPlacee;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "noOfWorkersUpdatedByUser")
 	private List<WorkersCount> workersCount;
 	
+	
+	@ManyToOne
+	@JoinColumn(name = "state_Id", referencedColumnName = "stateId")
+	private State state;
+
+	@ManyToOne
+	@JoinColumn(name = "Country_Id", referencedColumnName = "countryId")
+	private Country country;
+
+	@ManyToOne
+	@JoinColumn(name = "City_Id", referencedColumnName = "cityId")
+	private City city;
+	
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="user")
 	private List<TimeTracking> timeTracking;
 	
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(nullable = false)
+	@JoinColumn
 	private Organization organization;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<Reports> reports;
 
 	
-	
+	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
 	private List<DoNotTrack> track;
 	
@@ -119,7 +163,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.email = userRequestEntity.getEmail();
 		this.password=userRequestEntity.getPassword();
 		this.alternatePhoneNumber = userRequestEntity.getAlternatePhoneNumber();
+		this.address=userRequestEntity.getAddress();
+		this.postalCode=userRequestEntity.getPostalCode();
+		this.authenticationType=userRequestEntity.getAuthenticationType();
 		this.userType = userRequestEntity.getUserType();
+		this.country=userRequestEntity.getCountry();
+		this.state=userRequestEntity.getState();
+		this.city=userRequestEntity.getCity();
 		if (userRequestEntity.getAttachment() == null) {
 
 		} else {
@@ -128,7 +178,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		}
 		this.createdByUser = userRequestEntity.getCreatedByUser();
 		this.timeTracking = userRequestEntity.getTimeTracking();
-		this.timeTracking.forEach(x -> x.setUser(this));
+		if(userRequestEntity.getTimeTracking() != null) {
+			this.timeTracking.forEach(x -> x.setUser(this));
+		}
+		
 		this.organization = userRequestEntity.getOrganization();
 	}
 
@@ -199,7 +252,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.phoneNumber = eachUser.getPhoneNumber();
 		this.email = eachUser.getEmail();
 		this.password=eachUser.getPassword();
+		
 		this.alternatePhoneNumber = eachUser.getAlternatePhoneNumber();
+		this.authenticationType=eachUser.getAuthenticationType();
 		this.userType = eachUser.getUserType();
 		if (eachUser.getAttachment() == null) {
 
@@ -213,13 +268,71 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		   {
 			   this.timeTracking.forEach(x -> x.setUser(this));
 		   }
-		
+		this.city=eachUser.getCity();
+		this.state=eachUser.getState();
+		this.country=eachUser.getCountry();
 		this.organization = eachUser.getOrganization();
+		this.address=eachUser.getAddress();
+		this.postalCode=eachUser.getPostalCode();
 	}
 	
 	
 	
 	
+
+	public User(UserRequestEntity userRequestEntity, User userDatas) {
+		this.userId = userDatas.getUserId();
+		this.name = userRequestEntity.getName();
+		this.phoneNumber = userRequestEntity.getPhoneNumber();
+		this.email = userRequestEntity.getEmail();
+		this.alternatePhoneNumber = userDatas.getAlternatePhoneNumber();
+		this.userType = userRequestEntity.getUserType();
+		if (userRequestEntity.getAttachment() == null) {
+
+		} else {
+			this.attachment = userRequestEntity.getAttachment();
+			this.attachment.setUser(this);
+		}
+		this.createdByUser = userDatas.getCreatedByUser();
+		this.organization = userDatas.getOrganization();
+	}
+	
+
+	public User(Integer primaryUserId) {
+		this.userId=(long)primaryUserId;
+	}
+
+	public int getVerificationStatus() {
+		return verificationStatus;
+	}
+
+	public void setVerificationStatus(int verificationStatus) {
+		this.verificationStatus = verificationStatus;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public City getCity() {
+		return city;
+	}
+
+	public void setCity(City city) {
+		this.city = city;
+	}
 
 	public Set<SecondaryUser> getSecondaryUser() {
 		return SecondaryUser;
@@ -410,14 +523,35 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.track = track;
 	}
 
+	
+	
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+
 //	@Override
 //	public String toString() {
 //		return "User [userId=" + userId + ", name=" + name + ", passcode=" + passcode + ", phoneNumber=" + phoneNumber
-//				+ ", email=" + email + ", alternatePhoneNumber=" + alternatePhoneNumber + ", status=" + status
-//				+ ", userStatus=" + userStatus + ", createdByUser=" + createdByUser + ", userType=" + userType
-//				+ ", attachment=" + attachment + ", attendance=" + attendance + ", workPlace=" + workPlace
-//				+ ", workPlacee=" + workPlacee + ", workersCount=" + workersCount + ", timeTracking=" + timeTracking
-//				+ ", organization=" + organization + "]";
+//				+ ", email=" + email + ", password=" + password + ", alternatePhoneNumber=" + alternatePhoneNumber
+//				+ ", status=" + status + ", userStatus=" + userStatus + ", authenticationType=" + authenticationType
+//				+ ", address=" + address + ", postalCode=" + postalCode + ", createdByUser=" + createdByUser
+//				+ ", otpToken=" + otpToken + ", userType=" + userType + ", attachment=" + attachment + ", attendance="
+//				+ attendance + ", workPlace=" + workPlace + ", SecondaryUser=" + SecondaryUser + ", primaryUser="
+//				+ primaryUser + ", workPlacee=" + workPlacee + ", workersCount=" + workersCount + ", state=" + state
+//				+ ", country=" + country + ", city=" + city + ", timeTracking=" + timeTracking + ", organization="
+//				+ organization + ", reports=" + reports + ", track=" + track + "]";
 //	}
 
 	

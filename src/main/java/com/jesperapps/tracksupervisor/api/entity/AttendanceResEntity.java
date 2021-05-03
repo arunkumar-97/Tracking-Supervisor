@@ -6,7 +6,6 @@ import com.jesperapps.tracksupervisor.api.message.AttendanceRequestEntity;
 public class AttendanceResEntity extends BaseResponse{
 	
 	private AttendanceRequestEntity data;
-	
 	private Integer statusCode;
 	private String description;
 	private Integer errorCode;

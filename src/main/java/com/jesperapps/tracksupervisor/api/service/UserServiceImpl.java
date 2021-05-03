@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import javax.net.ssl.HttpsURLConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jesperapps.tracksupervisor.api.extra.OtpRequest;
+import com.jesperapps.tracksupervisor.api.extra.OtpResponse;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
 import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.User;
@@ -25,6 +28,10 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	
+	@Autowired
+private EmailService emailService;
 
 	@Override
 	public Optional<User> createUser(User user) {
@@ -208,4 +215,58 @@ public class UserServiceImpl implements UserService {
 		// TODO Auto-generated method stub
 		return userRepository.findAllByUserId(userId);
 	}
+
+	@Override
+	public User findByOrganization(Organization organization) {
+		// TODO Auto-generated method stub
+		return userRepository.findByOrganization(organization);
+	}
+
+	@Override
+	public List<User> findAllByPhoneNumberOrEmail(String phoneNumber, String email) {
+		// TODO Auto-generated method stub
+		return userRepository.findAllByPhoneNumberOrEmail(phoneNumber,email);
+	}
+
+	@Override
+	public List<User> findByUser(List<User> user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public User findByUserId(Long userId) {
+		// TODO Auto-generated method stub
+		return userRepository.findByUserId(userId);
+	}
+
+	@Override
+	public List<OtpResponse> validateOTP(List<OtpRequest> emailOtpRequest) {
+		List<OtpResponse> responseList = new ArrayList<>();
+
+		for (OtpRequest request : emailOtpRequest) {
+			OtpResponse response = new OtpResponse(400, "Bad request");
+			User requestUser = this.findUserByEmail(request.getEmail());
+			if (requestUser != null) {
+				if (emailService.checkOTP(requestUser, request.getOtp())) {
+					User user = this.findUserByEmail(requestUser.getEmail());
+					user.setVerificationStatus(1);
+					userRepository.save(user);
+					response.setStatusCode(200);
+					response.setDescription("Otp Matched");
+				} else {
+					response.setStatusCode(400);
+					response.setDescription("Otp Mismatch");
+				}
+			} else {
+				response.setStatusCode(409);
+				response.setDescription("No user found");
+			}
+			responseList.add(response);
+		}
+
+		return responseList;
+	}
+
+	
 }

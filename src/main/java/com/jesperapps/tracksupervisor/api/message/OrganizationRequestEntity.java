@@ -6,6 +6,7 @@ import java.util.List;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.IndustryType;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
@@ -14,7 +15,7 @@ public class OrganizationRequestEntity {
 	
 	private Integer organizationId;
 	private String organizationName;
-	private String industryType;
+	private IndustryType industryType;
 	private String contactPerson;
 	private String contactCountryCode;
 	private String contactPhoneNumber;
@@ -30,6 +31,17 @@ public class OrganizationRequestEntity {
 	private Attachment attachment;
 	private List<User> user;
 	private Status status;
+	private String gstNumber;
+	
+	
+	
+	
+	public String getGstNumber() {
+		return gstNumber;
+	}
+	public void setGstNumber(String gstNumber) {
+		this.gstNumber = gstNumber;
+	}
 	public Integer getOrganizationId() {
 		return organizationId;
 	}
@@ -42,10 +54,11 @@ public class OrganizationRequestEntity {
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
 	}
-	public String getIndustryType() {
+	
+	public IndustryType getIndustryType() {
 		return industryType;
 	}
-	public void setIndustryType(String industryType) {
+	public void setIndustryType(IndustryType industryType) {
 		this.industryType = industryType;
 	}
 	public String getContactPerson() {

@@ -6,7 +6,10 @@ import java.util.Set;
 import com.jesperapps.tracksupervisor.api.extra.BaseResponse;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
+import com.jesperapps.tracksupervisor.api.model.City;
+import com.jesperapps.tracksupervisor.api.model.Country;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.UserType;
@@ -22,7 +25,11 @@ public class UserResponseEntity extends BaseResponse{
 	private String alternatePhoneNumber;
 	private String status;
 	private String userStatus;
-	
+	private String address;
+	private String postalCode;
+	private State state;
+	private Country country;
+	private City city;
 	private Long createdByUser;
 
 	private Set<UserType> userType;
@@ -75,11 +82,61 @@ public class UserResponseEntity extends BaseResponse{
 	public UserResponseEntity(User userDatas, User userDatas2) {
 	this.userId = userDatas.getUserId();
 	this.userStatus = userDatas.getUserStatus();
+	this.name = userDatas.getName();
+	this.passcode = userDatas.getPasscode();
+	this.phoneNumber = userDatas.getPhoneNumber();
+	this.email = userDatas.getEmail();
+	this.alternatePhoneNumber = userDatas.getAlternatePhoneNumber();
+	this.status = userDatas.getStatus();
+	this.userType = userDatas.getUserType();
+	this.attachment = userDatas.getAttachment();
+	this.createdByUser = userDatas.getCreatedByUser();
+	this.organization = userDatas.getOrganization();
 	}
 	
 	
 	
 	
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public City getCity() {
+		return city;
+	}
+
+	public void setCity(City city) {
+		this.city = city;
+	}
 
 	public String getPassword() {
 		return password;

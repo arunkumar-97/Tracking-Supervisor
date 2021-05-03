@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 public class City {
 	
 	@Id
+	
 	private Integer cityId;
 	private String cityName;
 	
@@ -23,6 +24,9 @@ public class City {
 	
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "city")
 	private List<Organization> organization;
+	
+	@OneToMany(mappedBy = "city")
+	private List<User> user;
 	
 	public Integer getCityId() {
 		return cityId;

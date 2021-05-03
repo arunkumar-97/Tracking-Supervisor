@@ -3,10 +3,9 @@ package com.jesperapps.tracksupervisor.api.controller;
 import java.sql.Date;
 import java.util.ArrayList;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,6 +49,7 @@ public class WorkPlaceController {
 
 	@PostMapping("/work-place")
 	public ResponseEntity createWorkPlace(@RequestBody WorkPlaceRequestEntity workPlaceReqEntity) {
+		
 
 		if (workPlaceReqEntity.getFromDate() == null) {
 			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
@@ -92,22 +92,120 @@ public class WorkPlaceController {
 			}
 
 		}
-		WorkPlace workPlace = new WorkPlace(workPlaceReqEntity);
-		WorkPlace workPlaces = workPlaceService.save(workPlace);
-		if (workPlaces != null) {
+	WorkPlace	workPlaceFromDb=workPlaceService.findByAssignedToUserAndFromDateAndToDate(workPlaceReqEntity.getAssignedToUser(),workPlaceReqEntity.getFromDate(),workPlaceReqEntity.getToDate());
+		if(workPlaceFromDb==null) {
+			WorkPlace workPlace = new WorkPlace(workPlaceReqEntity);
+			WorkPlace workPlaces = workPlaceService.save(workPlace);
+			if (workPlaces != null) {
 
-			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-			workPlaceResponseEntity.setStatusCode(200);
-			workPlaceResponseEntity.setErrorCode(null);
-			workPlaceResponseEntity.setDescription("WorkPlace Added Successfully");
-			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.OK);
-		} else {
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setStatusCode(200);
+				workPlaceResponseEntity.setErrorCode(null);
+				workPlaceResponseEntity.setDescription("WorkPlace Added Successfully");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.OK);
+			} else {
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setErrorCode(400);
+				workPlaceResponseEntity.setMessage("Unable to add WorkPlace");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+			}
+		}else {
 			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
 			workPlaceResponseEntity.setErrorCode(400);
-			workPlaceResponseEntity.setMessage("Unable to add WorkPlace");
+			workPlaceResponseEntity.setMessage("WorkPlace Already Assigned to the User");
 			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
 		}
+		
 	}
+	
+	@PostMapping("/multiple/work-place")
+	public ResponseEntity createWorkPlace(@RequestBody List<WorkPlaceRequestEntity> workPlaceReqEntity) {
+		WorkPlaceResponseEntity response=new WorkPlaceResponseEntity();
+		List<WorkPlaceResponseEntity> clas=new ArrayList<>();
+		for(WorkPlaceRequestEntity each:workPlaceReqEntity) {
+
+			if (each.getFromDate() == null) {
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setErrorCode(400);
+				workPlaceResponseEntity.setMessage("FromDate can't be empty");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+			}
+			if (each.getToDate() == null) {
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setErrorCode(400);
+				workPlaceResponseEntity.setMessage("ToDate can't be empty");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+			}
+			if (each.getAddress() == null || each.getAddress().isEmpty()) {
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setErrorCode(400);
+				workPlaceResponseEntity.setMessage("Address can't be empty");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+			} else {
+				for (Address address : each.getAddress()) {
+					if (address.getLatitude().equals(0.0)) {
+						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+						workPlaceResponseEntity.setErrorCode(400);
+						workPlaceResponseEntity.setMessage("Latitude can't be empty");
+						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+					}
+					if (address.getLongitude().equals(0.0)) {
+						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+						workPlaceResponseEntity.setErrorCode(400);
+						workPlaceResponseEntity.setMessage("Longitude can't be empty");
+						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+					}
+
+					if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
+						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+						workPlaceResponseEntity.setErrorCode(400);
+						workPlaceResponseEntity.setMessage("Address can't be empty");
+						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+					}
+				}
+
+			}
+			
+			List<WorkPlace>	workPlaceFromDb=workPlaceService.findAllByAssignedToUserAndFromDateAndToDate(each.getAssignedToUser(),each.getFromDate(),each.getToDate());
+			if(workPlaceFromDb.isEmpty()) {
+				WorkPlace workPlace = new WorkPlace(each);
+				WorkPlace workPlaces = workPlaceService.save(workPlace);
+
+			
+		}else {
+//		System.out.println("checking else");
+				WorkPlaceResponseEntity res=new WorkPlaceResponseEntity(workPlaceFromDb.get(0));	
+//				System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+				   clas.add(res);
+			
+		}
+	
+		}
+		if(clas.isEmpty()) {
+			response.setStatusCode(200);
+			response.setDescription("Successfully Created");
+			return new ResponseEntity(response, HttpStatus.OK);
+		}else {
+			 String descrption = null;
+			 for(WorkPlaceResponseEntity cl :  clas)
+			 {     
+//				 System.out.println("Before");
+				 if(descrption != null) 
+				 {
+//					 System.out.println("if");
+					 descrption = descrption +","+ cl.getAssignedToUser().getName();
+				 }else {
+					 descrption =   cl.getAssignedToUser().getName();
+				 }
+				 System.out.println("Description "+ descrption);
+			 }
+			response.setStatusCode(409);
+			response.setDescription(descrption +" " +"workplace  is Already Assigned for the User");
+			return new ResponseEntity(response, HttpStatus.CONFLICT);
+		}
+		
+	}
+
 
 	@PutMapping("/work-place/{supervisorUserId}/{noOfWorkers}/{date}/{address}/{noOfWorkersUpdatedByUserId}")
 	public ResponseEntity updateWorkPlace(@PathVariable("supervisorUserId") Long supervisorUserId,
@@ -162,12 +260,14 @@ public class WorkPlaceController {
 		User assignedToUser = new User(supervisorUserId, supervisorUserId);
 		List<WorkPlace> workPlace = workPlaceService.findAllByAssignedFromUserAndAssignedToUser(assignedFromUser,
 				assignedToUser);
+		System.out.println("Work Place :" +workPlace);
 		if (workPlace.isEmpty()) {
 			WorkPlaceResponseEntity workPlaceResEntity = new WorkPlaceResponseEntity();
 			workPlaceResEntity.setErrorCode(204);
 			workPlaceResEntity.setMessage("No Data is Available");
 			return new ResponseEntity(workPlaceResEntity, HttpStatus.NOT_FOUND);
 		} else {
+			System.out.println("else");
 			List<WorkPlaceResponseEntity> workPlaceResponseEntity1 = new ArrayList<WorkPlaceResponseEntity>();
 			for (WorkPlace workPlace1 : workPlace) {
 				if (workPlace1.getStatus().getStatusName() == null

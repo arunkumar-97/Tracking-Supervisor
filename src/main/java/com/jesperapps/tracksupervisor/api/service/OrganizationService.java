@@ -25,6 +25,10 @@ public interface OrganizationService {
 	ResponseEntity createOrganization(OrganizataionWithUserRequestEntity orgRequest);
 
 	Organization addOrganization(OrganizationRequestEntity organizationRequestEntity);
+
+	Organization findByOrganizationName(String organizationName);
+
+	Organization findByOrganizationId(Integer organizationId);
 	
 
 //	OrganizationDemo findByName(String organizationName);

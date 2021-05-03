@@ -3,6 +3,8 @@ package com.jesperapps.tracksupervisor.api.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.jesperapps.tracksupervisor.api.extra.OtpRequest;
+import com.jesperapps.tracksupervisor.api.extra.OtpResponse;
 import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.UserType;
@@ -50,5 +52,17 @@ public interface UserService {
 	User findUserByEmailOrPhoneNumber(String email, String phoneNumber);
 
 	List<User> findAllByUserId(Integer userId);
+
+	User findByOrganization(Organization organization);
+
+	List<User> findAllByPhoneNumberOrEmail(String phoneNumber, String email);
+
+	List<User> findByUser(List<User> user);
+
+	User findByUserId(Long userId);
+
+	List<OtpResponse> validateOTP(List<OtpRequest> emailOtpRequest);
+
+	
 
 }

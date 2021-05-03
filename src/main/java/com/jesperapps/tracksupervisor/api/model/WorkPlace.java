@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.model;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jesperapps.tracksupervisor.api.message.WorkPlaceRequestEntity;
 
 @Entity
@@ -24,7 +26,11 @@ public class WorkPlace {
 	private Long workPlaceId;
 	private Date fromDate;
 	private Date toDate;
+	private Time startTime;
+	private Time endTime;
+	private String timeInterval;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "workPlace", cascade = CascadeType.ALL)
 	private List<Address> address;
 
@@ -54,6 +60,9 @@ public class WorkPlace {
 		this.address = workPlaceReqEntity.getAddress();
 		this.address.forEach(x -> x.setWorkPlace(this));
 		this.status = workPlaceReqEntity.getStatus();
+		this.startTime=workPlaceReqEntity.getStartTime();
+		this.endTime=workPlaceReqEntity.getEndTime();
+		this.timeInterval=workPlaceReqEntity.getTimeInterval();
 	}
 
 	public WorkPlace(WorkPlace workPlace) {
@@ -65,6 +74,32 @@ public class WorkPlace {
 		this.assignedFromUser = workPlace.getAssignedFromUser();
 		this.assignedToUser = workPlace.getAssignedToUser();
 		this.status = workPlace.getStatus();
+	}
+	
+	
+
+	public String getTimeInterval() {
+		return timeInterval;
+	}
+
+	public void setTimeInterval(String timeInterval) {
+		this.timeInterval = timeInterval;
+	}
+
+	public Time getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Time startTime) {
+		this.startTime = startTime;
+	}
+
+	public Time getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Time endTime) {
+		this.endTime = endTime;
 	}
 
 	public Long getWorkPlaceId() {

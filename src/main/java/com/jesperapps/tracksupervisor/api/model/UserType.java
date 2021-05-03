@@ -38,6 +38,7 @@ public class UserType extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "status")
 	private String status;
 
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "userType")
 	private Set<User> user;
 

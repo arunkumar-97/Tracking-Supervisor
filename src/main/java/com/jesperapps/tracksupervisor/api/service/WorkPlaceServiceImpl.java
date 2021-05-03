@@ -67,4 +67,17 @@ public class WorkPlaceServiceImpl implements WorkPlaceService{
 		}
 	}
 
+	@Override
+	public WorkPlace findByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate) {
+		// TODO Auto-generated method stub
+		return workPlaceRepository.findByAssignedToUserAndFromDateAndToDate(assignedToUser,fromDate,toDate);
+	}
+
+	@Override
+	public List<WorkPlace> findAllByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate,
+			Date toDate) {
+		// TODO Auto-generated method stub
+		return workPlaceRepository.findAllByAssignedToUserAndFromDateAndToDate(assignedToUser,fromDate,toDate);
+	}
+
 }

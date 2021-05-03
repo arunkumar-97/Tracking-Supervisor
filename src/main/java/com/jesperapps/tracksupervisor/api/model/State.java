@@ -29,6 +29,9 @@ public class State {
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "state")
 	private List<Organization> organization;
 	
+	@OneToMany(cascade = CascadeType.ALL,mappedBy = "state")
+	private List<User> user;
+	
 	public Integer getStateId() {
 		return stateId;
 	}

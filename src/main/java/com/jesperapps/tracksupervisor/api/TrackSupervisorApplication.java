@@ -1,7 +1,10 @@
 package com.jesperapps.tracksupervisor.api;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.xbill.DNS.*;
 
 import java.util.Iterator;
@@ -115,6 +118,7 @@ public class TrackSupervisorApplication {
 //		javax.naming.directory.Attribute a = attributes.get("SRV");
 			SpringApplication.run(TrackSupervisorApplication.class, args);
 //		}
+	
 	}
 //	 public static double distance_Between_LatLong(double lat1, double lon1, double lat2, double lon2) {
 //	        

@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Attachment {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 //	@Column(name = "attachment_id")
 	private Long attachmentId;
 	private String fileName;
@@ -40,7 +40,7 @@ public class Attachment {
 	private AttachmentByte attachmentByte;
 	
 	@JsonBackReference("organization_attachment")
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "organization_id")
 	private Organization organization;
 

@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.message;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +16,9 @@ public class WorkPlaceResponseEntity extends BaseResponse{
 	private Long workPlaceId;
 	private Date fromDate;
 	private Date toDate;
+	private Time startTime;
+	private Time endTime;
+	private String timeInterval;
 	private User assignedFromUser;
 	private User assignedToUser;
 	private List<Address> address;
@@ -34,6 +38,38 @@ public class WorkPlaceResponseEntity extends BaseResponse{
 		this.assignedToUser = workPlace1.getAssignedToUser();
 		this.address = workPlace1.getAddress();
 		this.status = workPlace1.getStatus();
+	}
+
+	
+	
+
+	public String getTimeInterval() {
+		return timeInterval;
+	}
+
+
+	public void setTimeInterval(String timeInterval) {
+		this.timeInterval = timeInterval;
+	}
+
+
+	public Time getStartTime() {
+		return startTime;
+	}
+
+
+	public void setStartTime(Time startTime) {
+		this.startTime = startTime;
+	}
+
+
+	public Time getEndTime() {
+		return endTime;
+	}
+
+
+	public void setEndTime(Time endTime) {
+		this.endTime = endTime;
 	}
 
 
