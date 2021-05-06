@@ -2,6 +2,7 @@ package com.jesperapps.tracksupervisor.api.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -35,6 +37,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		return otpToken;
 	}
 
+	public State getStates() {
+		return states;
+	}
+
+	public void setStates(State states) {
+		this.states = states;
+	}
+
 	public void setOtpToken(ConfirmationToken otpToken) {
 		this.otpToken = otpToken;
 	}
@@ -51,6 +61,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	private String status;
 	private String userStatus;
 	private String authenticationType;
+	@Lob
 	private String address;
 	private String postalCode;
 	private int verificationStatus;
@@ -103,9 +114,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	private List<WorkersCount> workersCount;
 	
 	
+	/*
+	 * @Override public String toString() { return "User [userId=" + userId +
+	 * ", name=" + name + ", passcode=" + passcode + ", phoneNumber=" + phoneNumber
+	 * + ", email=" + email + ", password=" + password + ", alternatePhoneNumber=" +
+	 * alternatePhoneNumber + ", status=" + status + "]"; }
+	 */
+
 	@ManyToOne
 	@JoinColumn(name = "state_Id", referencedColumnName = "stateId")
-	private State state;
+	private State states;
 
 	@ManyToOne
 	@JoinColumn(name = "Country_Id", referencedColumnName = "countryId")
@@ -168,7 +186,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.authenticationType=userRequestEntity.getAuthenticationType();
 		this.userType = userRequestEntity.getUserType();
 		this.country=userRequestEntity.getCountry();
-		this.state=userRequestEntity.getState();
+		this.states=userRequestEntity.getStates();
 		this.city=userRequestEntity.getCity();
 		if (userRequestEntity.getAttachment() == null) {
 
@@ -199,6 +217,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.passcode = user.getPasscode();
 		this.phoneNumber = user.getPhoneNumber();
 		this.email = user.getEmail();
+		this.states=user.getStates();
+		this.country=user.getCountry();
+		this.city=user.getCity();
+		this.password=user.getPassword();
+		this.postalCode=user.getPostalCode();
+		this.address=user.getAddress();
+		this.createdByUser=user.getCreatedByUser();
 		this.alternatePhoneNumber = user.getAlternatePhoneNumber();
 		this.status = user.getStatus();
 		this.userType = user.getUserType();
@@ -269,7 +294,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 			   this.timeTracking.forEach(x -> x.setUser(this));
 		   }
 		this.city=eachUser.getCity();
-		this.state=eachUser.getState();
+		this.states=eachUser.getStates();
 		this.country=eachUser.getCountry();
 		this.organization = eachUser.getOrganization();
 		this.address=eachUser.getAddress();
@@ -302,6 +327,53 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.userId=(long)primaryUserId;
 	}
 
+	public User(UserRequestEntity userDatas) {
+		this.userId = userDatas.getUserId();
+		this.name = userDatas.getName();
+		this.phoneNumber = userDatas.getPhoneNumber();
+		this.email = userDatas.getEmail();
+		this.alternatePhoneNumber = userDatas.getAlternatePhoneNumber();
+		this.userType = userDatas.getUserType();
+		if (userDatas.getAttachment() == null) {
+
+		} else {
+			this.attachment = userDatas.getAttachment();
+			this.attachment.setUser(this);
+		}
+		this.createdByUser = userDatas.getCreatedByUser();
+		this.organization = userDatas.getOrganization();
+	}
+
+	public User(Optional<User> userDatas, UserRequestEntity eachUser) {
+		this.userId = eachUser.getUserId();
+		this.name = eachUser.getName();
+		this.phoneNumber = eachUser.getPhoneNumber();
+		this.email = eachUser.getEmail();
+		this.password=eachUser.getPassword();
+		
+		this.alternatePhoneNumber = eachUser.getAlternatePhoneNumber();
+		this.authenticationType=eachUser.getAuthenticationType();
+		this.userType = eachUser.getUserType();
+		if (eachUser.getAttachment() == null) {
+
+		} else {
+			this.attachment = eachUser.getAttachment();
+			this.attachment.setUser(this);
+		}
+		this.createdByUser = eachUser.getCreatedByUser();
+		this.timeTracking = eachUser.getTimeTracking();
+		   if(eachUser.getTimeTracking() !=  null)
+		   {
+			   this.timeTracking.forEach(x -> x.setUser(this));
+		   }
+		this.city=eachUser.getCity();
+		this.states=eachUser.getStates();
+		this.country=eachUser.getCountry();
+		this.organization = eachUser.getOrganization();
+		this.address=eachUser.getAddress();
+		this.postalCode=eachUser.getPostalCode();
+	}
+
 	public int getVerificationStatus() {
 		return verificationStatus;
 	}
@@ -311,11 +383,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 	public State getState() {
-		return state;
+		return states;
 	}
 
 	public void setState(State state) {
-		this.state = state;
+		this.states = state;
 	}
 
 	public Country getCountry() {
@@ -540,6 +612,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
 	}
+	
 
 //	@Override
 //	public String toString() {

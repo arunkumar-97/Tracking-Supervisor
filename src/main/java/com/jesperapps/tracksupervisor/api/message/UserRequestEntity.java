@@ -29,17 +29,14 @@ public class UserRequestEntity {
 	private String authenticationType;
 	private String address;
 	private String postalCode;
-	private State state;
+	private State states;
 	private Country country;
 	private City city;
-	
 	private Long createdByUser;
-
 	private Set<UserType> userType;
 	private Attachment attachment;
 	private Set<Attendance> userData;
 	private List<TimeTracking> timeTracking;
-	
 	private Organization organization;
 
 	public UserRequestEntity() {
@@ -110,6 +107,13 @@ public class UserRequestEntity {
 		this.userType = secondaryUser.getUserType();
 		this.createdByUser = secondaryUser.getCreatedByUser();
 		this.timeTracking  = secondaryUser.getTimeTracking();
+		this.phoneNumber=secondaryUser.getPhoneNumber();
+		this.alternatePhoneNumber=secondaryUser.getAlternatePhoneNumber();
+		this.city=secondaryUser.getCity();
+		this.states=secondaryUser.getState();
+		this.country=secondaryUser.getCountry();
+		this.postalCode=secondaryUser.getPostalCode();
+		this.address=secondaryUser.getAddress();
 		this.organization = secondaryUser.getOrganization();
 		this.email = secondaryUser.getEmail();
 		this.name = secondaryUser.getName();
@@ -132,12 +136,14 @@ public class UserRequestEntity {
 		this.postalCode = postalCode;
 	}
 
-	public State getState() {
-		return state;
+	
+
+	public State getStates() {
+		return states;
 	}
 
-	public void setState(State state) {
-		this.state = state;
+	public void setStates(State states) {
+		this.states = states;
 	}
 
 	public Country getCountry() {

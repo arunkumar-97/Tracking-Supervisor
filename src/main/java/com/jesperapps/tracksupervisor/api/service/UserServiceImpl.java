@@ -51,7 +51,10 @@ private EmailService emailService;
 
 	@Override
 	public User save(User users) {
-		return userRepository.save(users);
+		System.out.println("usersimpl"+users);
+		User usr =  userRepository.save(users);
+		System.out.println("usr"+usr);
+		 return usr;
 	}
 
 	@Override

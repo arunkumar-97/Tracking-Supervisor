@@ -26,7 +26,7 @@ public class OrganizationResponseEntity extends BaseResponse{
 	private String fiscalYearStart;
 	private String defaulTimezone;
 	private String reportingCurrency;
-	private State state;
+	private State states;
 	private Country country;
 	private City city;
 	private Attachment attachment;
@@ -35,16 +35,32 @@ public class OrganizationResponseEntity extends BaseResponse{
 	private String gstNumber;
 	
 	public OrganizationResponseEntity() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	
 	public OrganizationResponseEntity(Organization organization) {
-		super();
+		
 		this.organizationId = organization.getOrganizationId();
 		this.organizationName = organization.getOrganizationName();
 		this.attachment = organization.getAttachment();
 		this.status = organization.getStatus();
+		this.industryType=organization.getIndustryType();
+		this.contactPerson=organization.getContactPerson();
+		this.contactCountryCode=organization.getContactCountryCode();
+		this.contactPhoneNumber=organization.getContactPhoneNumber();
+		this.contactEmail=organization.getContactEmail();
+		this.address=organization.getContactEmail();
+		this.postalCode=organization.getPostalCode();
+		this.fiscalYearStart=organization.getFiscalYearStart();
+		this.defaulTimezone=organization.getDefaulTimezone();
+		this.reportingCurrency=organization.getReportingCurrency();
+		this.states=organization.getState();
+		this.country=organization.getCountry();
+		this.city=organization.getCity();
+		this.status=organization.getStatus();
+		this.gstNumber=organization.getGstNumber();
+		this.user=organization.getUser();
 	}
 
 
@@ -135,12 +151,17 @@ public class OrganizationResponseEntity extends BaseResponse{
 	public void setReportingCurrency(String reportingCurrency) {
 		this.reportingCurrency = reportingCurrency;
 	}
-	public State getState() {
-		return state;
+	
+	public State getStates() {
+		return states;
 	}
-	public void setState(State state) {
-		this.state = state;
+
+
+	public void setStates(State states) {
+		this.states = states;
 	}
+
+
 	public Country getCountry() {
 		return country;
 	}

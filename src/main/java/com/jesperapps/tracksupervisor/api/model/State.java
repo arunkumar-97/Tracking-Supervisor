@@ -26,12 +26,20 @@ public class State {
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "state")
 	private List<City> city;
 	
-	@OneToMany(cascade = CascadeType.ALL,mappedBy = "state")
+	@OneToMany(cascade = CascadeType.ALL,mappedBy = "states")
 	private List<Organization> organization;
 	
-	@OneToMany(cascade = CascadeType.ALL,mappedBy = "state")
+	@OneToMany(cascade = CascadeType.ALL,mappedBy = "states")
 	private List<User> user;
 	
+	public State() {
+		
+	}
+	
+	public State(long numericCellValue) {
+		// TODO Auto-generated constructor stub
+		this.stateId=(int) numericCellValue;
+	}
 	public Integer getStateId() {
 		return stateId;
 	}

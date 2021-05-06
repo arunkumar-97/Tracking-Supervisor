@@ -28,6 +28,13 @@ public class City {
 	@OneToMany(mappedBy = "city")
 	private List<User> user;
 	
+	public City() {
+		
+	}
+	
+	public City(long numericCellValue) {
+		this.cityId=(int) numericCellValue;
+	}
 	public Integer getCityId() {
 		return cityId;
 	}

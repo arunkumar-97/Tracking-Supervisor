@@ -6,8 +6,6 @@ public class ResponseMessage {
 	public String content;
 	
 	
-	
-
 	public ResponseMessage(String content) {
 		super();
 		this.content = content;

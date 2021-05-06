@@ -125,7 +125,8 @@ public class OrganizationController {
 		Organization organizationFromDb	=organizationService.findByOrganizationName(organizationRequestEntity.getOrganizationName());
 //		System.out.println(employeeRequest.getEmpoyeeId());
 		if(organizationFromDb == null) {
-
+			Organization createdOrganization = null;
+			User createduser = null ;
 				List<User>	newUser=organizationRequestEntity.getUser();
 				
 				System.out.println("user"  + organizationRequestEntity.getUser());
@@ -156,10 +157,10 @@ public class OrganizationController {
 				
 					
 				}
+//				Organization organization;
 				
 				
-				
-				Organization createdOrganization=organizationService.addOrganization(organizationRequestEntity);
+				 createdOrganization=organizationService.addOrganization(organizationRequestEntity);
 				if(createdOrganization != null) {
 					
 					Organization organization = new Organization(createdOrganization.getOrganizationId());
@@ -201,7 +202,7 @@ public class OrganizationController {
 					System.out.println("Organization " +organization.getOrganizationId());
 					user.setOrganization(organization);
 					if(organizationRequestEntity.getAttachment() == null) {
-						userService.save(user);
+						createduser = userService.save(user);
 					}else {
 						System.out.println("Attachment" + user.getAttachment());
 						Attachment att = user.getAttachment();
@@ -255,7 +256,11 @@ public class OrganizationController {
 
 				
 				}
-				OrganizationResponseEntity userResEntity = new OrganizationResponseEntity();
+			
+				OrganizationResponseEntity userResEntity = new OrganizationResponseEntity(createdOrganization);
+				 List<User> userlist = new ArrayList<User>();
+				 userlist.add(createduser);
+				 userResEntity.setUser(userlist);
 				userResEntity.setErrorCode(200);
 				userResEntity.setMessage("Organization Created Successfully");
 				return new ResponseEntity(userResEntity, HttpStatus.OK);

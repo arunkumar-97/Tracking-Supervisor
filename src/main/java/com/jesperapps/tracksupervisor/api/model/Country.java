@@ -31,6 +31,13 @@ public class Country {
 	private List<User> user;
 	
 	
+	public Country() {
+		super();
+	}
+	public Country(long numericCellValue) {
+		// TODO Auto-generated constructor stub
+		this.countryId=(int) numericCellValue;
+	}
 	public Integer getCountryId() {
 		return countryId;
 	}

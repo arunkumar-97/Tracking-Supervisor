@@ -30,6 +30,7 @@ public class AttendanceController {
 
 	@Autowired
 	private UserService userService;
+	
 	@Autowired
 	private AttendanceService attendanceService;
 

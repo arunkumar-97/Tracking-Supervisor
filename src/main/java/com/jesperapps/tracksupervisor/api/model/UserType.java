@@ -75,6 +75,10 @@ public class UserType extends AbstractAuditingEntity implements Serializable {
 
 	
 
+	public UserType(long numericCellValue) {
+		this.userTypeId=numericCellValue;
+	}
+
 	public Long getUserTypeId() {
 		return userTypeId;
 	}

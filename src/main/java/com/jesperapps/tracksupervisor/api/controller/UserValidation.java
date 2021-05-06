@@ -155,7 +155,7 @@ public class UserValidation {
 				}
 			
 			}else {
-				System.out.println("Password Invalid");	
+//				System.out.println("Password Invalid");	
 				UserResponseEntity response1=new UserResponseEntity();
 				response1.setStatusCode(409);
 				response1.setDescription("Password Invalid");
@@ -167,7 +167,7 @@ public class UserValidation {
 		
 		
 	}else {
-		System.out.println("else email does");	
+//		System.out.println("else email does");	
 		UserResponseEntity response3=new UserResponseEntity();
 		response3.setStatusCode(409);
 		response3.setDescription("Email does not exists");

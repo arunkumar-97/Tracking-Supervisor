@@ -2,25 +2,28 @@ package com.jesperapps.tracksupervisor.api.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.mail.internet.MimeMessage;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +31,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 
 //import com.jesperapps.schoolmanagement.api.service.OtpService;
 import com.jesperapps.tracksupervisor.api.entity.AttendanceResEntity;
@@ -45,8 +52,11 @@ import com.jesperapps.tracksupervisor.api.message.WorkPlaceResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.AttachmentByte;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
+import com.jesperapps.tracksupervisor.api.model.City;
+import com.jesperapps.tracksupervisor.api.model.Country;
 import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
+import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.UserType;
@@ -57,10 +67,13 @@ import com.jesperapps.tracksupervisor.api.service.OrganizationService;
 import com.jesperapps.tracksupervisor.api.service.OtpSmsService;
 import com.jesperapps.tracksupervisor.api.service.SecondaryUserService;
 import com.jesperapps.tracksupervisor.api.service.UserService;
+import com.microsoft.schemas.office.visio.x2012.main.CellType;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-public class UserController {
+public class UserController{
+	
+	private static final String SHEET = "Users";
 	@Autowired
 	private OrganizationService organizationService;
 	@Autowired
@@ -83,6 +96,222 @@ public class UserController {
 	@Autowired
 	private AttendanceService attendanceService;
 
+	
+	@PostMapping("/user/uploadfile")
+	public ResponseEntity uploadFile(
+	    @RequestParam("file") MultipartFile file) {
+
+	  try {
+		  InputStream is=file.getInputStream();
+	   
+		  Workbook workbook = new XSSFWorkbook(is);
+
+	      Sheet sheet = workbook.getSheet(SHEET);
+	      Iterator<Row> rows = sheet.iterator();
+	     
+	      List<User> users = new ArrayList<User>();
+
+	      int rowNumber = 0;
+	      while (rows.hasNext()) {
+	        Row currentRow = rows.next();
+	        
+	        // skip header
+	        if (rowNumber == 0) {
+	          rowNumber++;
+	          continue;
+	        }
+
+	        Iterator<Cell> cellsInRow = currentRow.iterator();
+
+	        User user = new User();
+
+	        int cellIdx = 0;
+	        while (cellsInRow.hasNext()) {
+	        	
+	          Cell currentCell = cellsInRow.next();
+//	          System.out.println(currentCell.getRow());
+	          switch (cellIdx) {
+	         
+
+	          case 0:
+	        	  
+//	        	    org.apache.poi.ss.usermodel.CellType cel = currentCell.getCellType();
+//	        	      System.out.println("cel" +cel);
+	        	user.setName(currentCell.getStringCellValue());
+	            break;
+
+	          case 1:
+//	        	  org.apache.poi.ss.usermodel.CellType cel2 = currentCell.getCellType();
+//        	      System.out.println("cel" +cel2);
+	        	 user.setEmail(currentCell.getStringCellValue().toString());
+//	            tutorial.setDescription(currentCell.getStringCellValue());
+	            break;
+
+	          case 2:
+//	        	  org.apache.poi.ss.usermodel.CellType cel3 = currentCell.getCellType();
+//        	      System.out.println("cel" +cel3);
+	        	 String phno=Double.toString(currentCell.getNumericCellValue());
+	        	System.out.println("phno :" + phno);
+	        	user.setPhoneNumber(phno.replaceAll("\\.", ""));
+//	            tutorial.setPublished(currentCell.getBooleanCellValue());
+	            break;
+
+	          case 3:
+	        	String c1=String.valueOf(currentCell.getNumericCellValue());  
+	        	c1=c1.split("\\.")[0];
+//	        	System.out.println("c :" + c1);
+	        	user.setPostalCode(c1);
+	        	break;
+	        	
+	        	
+	        	
+	          case 4:
+	          
+	          user.setAddress(currentCell.getStringCellValue().toString());
+	          break;
+	          
+	          case 5:
+		          
+		          user.setPassword(currentCell.getStringCellValue());
+		          break;
+		          
+		          
+	          case 6:
+		          
+		          user.setCreatedByUser((long) currentCell.getNumericCellValue());
+		          break;   
+	          case 7:
+	        	  
+	        Country c=new Country((long) currentCell.getNumericCellValue());
+	        user.setCountry(c);
+	          case 8:
+	        	  
+	  	        State s=new State((long) currentCell.getNumericCellValue());
+	  	        user.setStates(s);
+	          
+	          case 9:
+	        	  
+		  	        City city=new City((long) currentCell.getNumericCellValue());
+		  	        user.setCity(city);
+		  	        
+	          case 10:
+	        	  
+		  	        UserType userType=new UserType((long) currentCell.getNumericCellValue());
+		  	        Set<UserType> u=new HashSet<UserType>();
+		  	      u.add(userType);
+		  	      user.setUserType(u);
+		  	                        
+	  	        
+	          default:
+	            break;
+	          }
+
+	          cellIdx++;
+	        }
+
+	        users.add(user);
+	      }
+
+	      workbook.close();
+	      UserResponseEntity response=new UserResponseEntity();
+			List<UserResponseEntity> clas=new ArrayList<>();
+			
+//		return users;
+	for(User each:users) {
+			
+			User emailFromDb=		userService.findUserByEmail(each.getEmail());
+				if(emailFromDb == null) {
+					
+					Optional<User> numberFromDb=userService.findByPhoneNumber(each.getPhoneNumber());
+				
+					if(numberFromDb.isPresent()){
+					UserResponseEntity res=new UserResponseEntity(each.getName());	
+//					System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+					   clas.add(res);
+//					return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
+				}else {
+					User user = new User(each);
+					user.setVerificationStatus(1);
+					
+					User savedUsers = userService.save(user);
+					
+					SecondaryUser secondaryUser=new SecondaryUser(); 
+					//Set<SecondaryUser> secondaryUserList = createdByUser.get().getSecondaryUser();
+//					if(secondaryUserList == null) {
+//						secondaryUserList = new HashSet<>();
+//					}
+//					secondaryUserList.add(secondaryUser);
+					
+					User primaryuser =  new User(savedUsers.getCreatedByUser(),savedUsers.getCreatedByUser());
+					secondaryUser.setPrimaryUser(primaryuser);
+					secondaryUser.setSecondaryUser(savedUsers);
+					
+					secondaryUserService.save(secondaryUser);
+			
+					
+					
+					
+				}
+			}else {
+
+				UserResponseEntity res=new UserResponseEntity(each.getName());	
+//				System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+				   clas.add(res);
+				
+			}
+			
+			
+			
+////			List<User>	userFromDb = userService.findAllByOrganization(each.getOrganization());	
+//			if(userFromDb.isEmpty()) {
+//				User user = new User(each);
+//				User holidays = userService.save(user);
+//
+//			
+//		}else {
+////		System.out.println("checking else");
+//			UserResponseEntity res=new UserResponseEntity(userFromDb.get(0));	
+////				System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+//				   clas.add(res);
+//			
+//		}
+	
+		}
+		if(clas.isEmpty()) {
+			response.setStatusCode(200);
+			response.setDescription("Successfully Created");
+			return new ResponseEntity(response, HttpStatus.OK);
+		}else {
+			 String descrption = null;
+			 for(UserResponseEntity cl :  clas)
+			 {     
+//				 System.out.println("Before");
+				 if(descrption != null) 
+				 {
+//					 System.out.println("if");
+					 descrption = descrption +","+ cl.getName();
+				 }else {
+					 descrption =   cl.getName();
+				 }
+				 System.out.println("Description "+ descrption);
+			 }
+			response.setStatusCode(409);
+			response.setDescription(descrption +" " +"user  is Already exists");
+			return new ResponseEntity(response, HttpStatus.CONFLICT);
+		}
+		  
+	      
+		  
+		  
+	  }
+	  catch (Exception e) {
+		  System.out.println("Exception :" + e.getLocalizedMessage());
+	    return null;
+	  }
+	}
+	
+	
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PostMapping("/user")
 	public ResponseEntity createUser(@RequestBody UserRequestEntity userRequestEntity) throws IOException {
@@ -94,8 +323,6 @@ public class UserController {
 			userResponseEntity.setMessage("PhoneNumber can't be empty");
 			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 		}
-
-		
 		if (userRequestEntity.getName() == null || userRequestEntity.getName().isEmpty()) {
 			UserResEntity userResponseEntity = new UserResEntity();
 			userResponseEntity.setErrorCode(400);
@@ -188,7 +415,7 @@ public class UserController {
 		
 		
 		User user = new User(userRequestEntity, userRequestEntity);
-		System.out.println("userRequestEntity.getOrganization()"+userRequestEntity.getOrganization());
+//		System.out.println("userRequestEntity.getOrganization()"+userRequestEntity.getOrganization());
 		if(userRequestEntity.getOrganization() != null) {
 			user.setOrganization(userRequestEntity.getOrganization());
 		}
@@ -434,6 +661,7 @@ public class UserController {
 			   
 
 			if (user.getAttachment() != null) {
+//				System.out.println();
 				String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
 						.path(userData.get().getAttachment().getAttachmentId().toString()).toUriString();
 
@@ -549,387 +777,387 @@ public class UserController {
 	}
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@PostMapping("/multiple/user")
-	public ResponseEntity createUser(@RequestBody List<UserRequestEntity> userRequestEntity) throws IOException {
-
-		List<UserResponseEntity> response=new ArrayList<>();
-		for(UserRequestEntity each:userRequestEntity) {
-		
-		if (each.getUserType().isEmpty() || each.getUserType() == null) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("UserType can't be empty");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-		if (each.getPhoneNumber() == null || each.getPhoneNumber().isEmpty()) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("PhoneNumber can't be empty");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-
-		if (each.getAlternatePhoneNumber() == null
-				|| each.getAlternatePhoneNumber().isEmpty()) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("AlternatePhoneNumber can't be empty");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-
-		if (each.getName() == null || each.getName().isEmpty()) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("Name can't be empty");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-
-		if (each.getEmail() == null || each.getEmail().isEmpty()) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("Email can't be empty");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-		if (each.getPassword()== null || each.getPassword().isEmpty()) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("PhoneNumber can't be empty");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-		if (each.getAttachment() != null) {
-			if (each.getAttachment().getFileSize() > 4194304) {
-				UserResEntity userResponseEntity = new UserResEntity();
-				userResponseEntity.setErrorCode(400);
-				userResponseEntity.setMessage("Image size exceeded");
-				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-			}
-			if (each.getAttachment().getFileName().isEmpty()
-					|| each.getAttachment().getFileName() == null) {
-				UserResEntity userResponseEntity = new UserResEntity();
-				userResponseEntity.setErrorCode(400);
-				userResponseEntity.setMessage("FileName can't be empty");
-				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-			}
-			if (each.getAttachment().getFileType().isEmpty()
-					|| each.getAttachment().getFileType() == null) {
-				UserResEntity userResponseEntity = new UserResEntity();
-				userResponseEntity.setErrorCode(400);
-				userResponseEntity.setMessage("FileType can't be empty");
-				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-			}
-			if (each.getAttachment().getFileSize() == 0
-					|| each.getAttachment().getFileSize() == null) {
-				UserResEntity userResponseEntity = new UserResEntity();
-				userResponseEntity.setErrorCode(400);
-				userResponseEntity.setMessage("FileSize can't be empty");
-				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-			}
-
-			if (each.getAttachment().getAttachmentByte() != null) {
-				if (each.getAttachment().getAttachmentByte().getFileByte().length == 0
-						|| each.getAttachment().getAttachmentByte().getFileByte() == null) {
-					UserResEntity userResponseEntity = new UserResEntity();
-					userResponseEntity.setErrorCode(400);
-					userResponseEntity.setMessage("FileByte can't be empty");
-					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-				}
-
-			}
-
-		}
-//		Organization organization = new Organization(userRequestEntity.getOrganization());
-//		Organization organizationSaved = organizationService.save(organization);
-//		if (userRequestEntity.getOrganization().getAttachment() == null) {
-//		} else {
-//			Attachment att = new Attachment(userRequestEntity.getOrganization().getAttachment(), organizationSaved);
-//			organizationSaved.setAttachment(att);
-//			att.setOrganization(organizationSaved);
-//			attachmentService.save(att);
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	@PostMapping("/multiple/user")
+//	public ResponseEntity createUser(@RequestBody List<UserRequestEntity> userRequestEntity) throws IOException {
+//
+//		List<UserResponseEntity> response=new ArrayList<>();
+//		for(UserRequestEntity each:userRequestEntity) {
+//		
+//		if (each.getUserType().isEmpty() || each.getUserType() == null) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("UserType can't be empty");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 //		}
-//		if (organizationSaved.getAttachment() != null) {
-//
-//			String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
-//					.path(organizationSaved.getAttachment().getAttachmentId().toString()).toUriString();
-//
-//			String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
-//					.path(organizationSaved.getAttachment().getAttachmentId().toString()).toUriString();
-//
-//			organizationSaved.getAttachment().setFileDownloadUrl(fileDownloadUrl);
-//			organizationSaved.getAttachment().setFileViewUrl(fileViewUrl);
-//			organizationService.save(organizationSaved);
+//		if (each.getPhoneNumber() == null || each.getPhoneNumber().isEmpty()) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("PhoneNumber can't be empty");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 //		}
-		//System.out.println("time tracking"+ userRequestEntity.getTimeTracking().size());
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		User user = new User(each, each);
-		System.out.println("userRequestEntity.getOrganization()"+each.getOrganization());
-		if(each.getOrganization() != null) {
-			user.setOrganization(each.getOrganization());
-		}
-	
-		if (user.getAttachment() == null) {
-		} else {
-			
-			Attachment att = new Attachment(user.getAttachment());
-			user.setAttachment(att);
-			att.setUser(user);
-		}
-		List<User> userList = userService.findAllByPhoneNumberOrAlternatePhoneNumber(each.getPhoneNumber(),
-				each.getAlternatePhoneNumber());
-		if (userList.size()==0) {
-//			return postUser(user);
-		} else {
-			
-			
-			UserResponseEntity res = new UserResponseEntity(each);
-			System.out.println("RESPONSE" + res.getPhoneNumber());
-			res.setDescription(res.getPhoneNumber() + " Phone exists");
-			response.add(res);
-			
-			
-			
-			
-//			for (User usr : userList) {
-//				if (usr.getStatus() == null || usr.getStatus().equals("Active") || usr.getStatus().equals("InActive")) {
-//					UserResEntity userResponseEntity = new UserResEntity();
-//					userResponseEntity.setErrorCode(409);
-//					userResponseEntity.setMessage("PhoneNumber already exists");
-//					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-//				}
-//			}
-//			return postUser(user);
-		}
-
-		List<User> userListData = userService.findAllByAlternatePhoneNumberOrPhoneNumber(
-				each.getPhoneNumber(), each.getAlternatePhoneNumber());
-		if (userListData.size()==0) {
-//			return postUser(user);
-		} else {
-			UserResponseEntity res = new UserResponseEntity(each);
-			System.out.println("RESPONSE" + res.getPhoneNumber());
-			res.setDescription(res.getPhoneNumber() + " Phone exists");
-			response.add(res);
-//			return postUser(user);
-		}
-		
-		List<User> userEmailList = userService.findAllByEmail(
-				each.getEmail());
-		if(userEmailList.size()==0) {
-			
-		}else {
-			String description="";
-			UserResponseEntity res = new UserResponseEntity(each);
-			System.out.println("RESPONSE" + res.getEmail());
-			description=res.getEmail() + " Email Exists";
-//			List<User> userList1 = userService.findAllByPhoneNumberOrAlternatePhoneNumber(each.getPhoneNumber(),
-//					each.getAlternatePhoneNumber());
-//			if(userList1 != null) {
-//				description += "," + user.getPhoneNumber() + " Phone Exists " ;
-//			}
-			res.setDescription(description);
-//			res.setDescription(res.getEmail() + " Email Exists");
-			response.add(res);
-		}
-		
-		
-		int otp = otpService.generateOTP(user.getPhoneNumber());
-		if (otp == 0) {
-		} else {
-			if (user.getAuthenticationType().equalsIgnoreCase("sms")) {
-				sendSms("Your One Time Password(OTP) is " + otp, user.getPhoneNumber());
-
-			} else if (user.getAuthenticationType().equalsIgnoreCase("Email")) {
-				emailservice.sendOTPMail(user);
-
-			}
-		}
-
-//		int otp = otpService.generateOTP(userRequestEntity.getPhoneNumber());
-//		if (otp == 0) {
-//		} else {
-//			if (userRequestEntity.getAuthenticationType().equalsIgnoreCase("sms")) {
-//				sendSms("Your One Time Password(OTP) is " + otp, userRequestEntity.getPhoneNumber());
 //
-////			} else(userRequestEntity.getAuthenticationType().equalsIgnoreCase("Email")) {
-////				emailService.sendOTPMail(newUsersList);
-////
-////			}
+//		if (each.getAlternatePhoneNumber() == null
+//				|| each.getAlternatePhoneNumber().isEmpty()) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("AlternatePhoneNumber can't be empty");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 //		}
-		
-		
-		
-		Set<UserType> userTypes=each.getUserType();
-		for(UserType users:userTypes) {
-			if(users.getUserTypeId()==1) {
-				  System.out.println("Manager");
-				List<User> use=userService.findEmployeeByUserTypeAndOrganization(users,each.getOrganization());
-				     
-				if(use.isEmpty()==false) {
-					 System.out.println("has no manager");
-					UserResEntity userResponseEntity = new UserResEntity();
-					userResponseEntity.setErrorCode(409);
-					userResponseEntity.setMessage("Manager already exists in the Organization");
-					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT); 
-					
-				
-			}
-		}
-			
-		}
-		
-		
-		System.out.println("User :" + user);
-		Optional<User> userData = userService.createUser(user);
-		System.out.println("userData " + userData);
-//		Optional<User> createdByUser = userService.findById(user.getCreatedByUser());
-//		System.out.println("createdByUser " + createdByUser.get());
-		if (userData.isPresent()) {
-			Long code = 1000 + userData.get().getUserId();
-			userData.get().setPasscode(code);
-			Set<UserType> usertypelist =userData.get().getUserType();
-			    UserType  userType = usertypelist.stream().findFirst().get();
-			    
-			
-		             if(userType.getUserTypeId() == 1) 
-		             {		            	  
-		            	 Long createdbyuser = userData.get().getUserId();		            	
-		            	 userData.get().setCreatedByUser(createdbyuser);
-		            	 
-		             }
-			
-
-			if (user.getAttachment() != null) {
-				String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
-						.path(userData.get().getAttachment().getAttachmentId().toString()).toUriString();
-
-				String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
-						.path(userData.get().getAttachment().getAttachmentId().toString()).toUriString();
-				userData.get().getAttachment().setFileDownloadUrl(fileDownloadUrl);
-				userData.get().getAttachment().setFileViewUrl(fileViewUrl);
-			}
-
-		User userRes = userService.updatePassCode(userData.get());
-//			if (userRes == null) {
-//				System.out.println("Check");
+//
+//		if (each.getName() == null || each.getName().isEmpty()) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("Name can't be empty");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
+//
+//		if (each.getEmail() == null || each.getEmail().isEmpty()) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("Email can't be empty");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
+//		if (each.getPassword()== null || each.getPassword().isEmpty()) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("PhoneNumber can't be empty");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
+//		if (each.getAttachment() != null) {
+//			if (each.getAttachment().getFileSize() > 4194304) {
 //				UserResEntity userResponseEntity = new UserResEntity();
 //				userResponseEntity.setErrorCode(400);
-//				userResponseEntity.setMessage("Unable to create User");
+//				userResponseEntity.setMessage("Image size exceeded");
 //				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-//			} else {
-				
-				
-		
-//				try {
-//					SimpleMailMessage leaveCreatedEmail = new SimpleMailMessage();
-//					leaveCreatedEmail.setSubject("TrackSupervisor app Login Credentials from Jesperapps");
-//					leaveCreatedEmail.setText("Login Credentials: \n Your Login Passcode is: " + userRes.getPasscode());
-//					leaveCreatedEmail.setFrom("track@jespersoft.com");
-//					leaveCreatedEmail.setTo(userRes.getEmail());
-//					emailservice.sendEmail(leaveCreatedEmail);
-//				} catch (Exception ex) {
-//					System.out.println("ex" + ex);
-////					UserResEntity userResponseEntity = new UserResEntity();
-////					userResponseEntity.setErrorCode(400);
-////					userResponseEntity.setMessage("Unable to Send Mail");
-////					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//			}
+//			if (each.getAttachment().getFileName().isEmpty()
+//					|| each.getAttachment().getFileName() == null) {
+//				UserResEntity userResponseEntity = new UserResEntity();
+//				userResponseEntity.setErrorCode(400);
+//				userResponseEntity.setMessage("FileName can't be empty");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//			}
+//			if (each.getAttachment().getFileType().isEmpty()
+//					|| each.getAttachment().getFileType() == null) {
+//				UserResEntity userResponseEntity = new UserResEntity();
+//				userResponseEntity.setErrorCode(400);
+//				userResponseEntity.setMessage("FileType can't be empty");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//			}
+//			if (each.getAttachment().getFileSize() == 0
+//					|| each.getAttachment().getFileSize() == null) {
+//				UserResEntity userResponseEntity = new UserResEntity();
+//				userResponseEntity.setErrorCode(400);
+//				userResponseEntity.setMessage("FileSize can't be empty");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//			}
+//
+//			if (each.getAttachment().getAttachmentByte() != null) {
+//				if (each.getAttachment().getAttachmentByte().getFileByte().length == 0
+//						|| each.getAttachment().getAttachmentByte().getFileByte() == null) {
+//					UserResEntity userResponseEntity = new UserResEntity();
+//					userResponseEntity.setErrorCode(400);
+//					userResponseEntity.setMessage("FileByte can't be empty");
+//					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 //				}
-				UserRequestEntity userReqEntity = new UserRequestEntity(userData.get());
-				UserResEntity userResponseEntity = new UserResEntity(userReqEntity);
-				Set<UserType> ut = new HashSet<UserType>();
-				for (UserType ut1 : userResponseEntity.getData().getUserType()) {
-					UserType uType = new UserType(ut1);
-					ut.add(uType);
-				}
-				List<TimeTracking> timeTrackingList = new ArrayList<TimeTracking>();
-				if(userResponseEntity.getData().getTimeTracking() != null)
-				{
-					for (TimeTracking t : userResponseEntity.getData().getTimeTracking()) {
-						TimeTracking timeTracking = new TimeTracking(t);
-						timeTrackingList.add(timeTracking);
-					}
-				}
-				
-				
-				
-		for(UserType each1:userRes.getUserType()) {
-					
-					if((each1.getUserTypeId()==2 || each1.getUserTypeId()==3) && userRes.getCreatedByUser() != null) {
-						
-						SecondaryUser secondaryUser=new SecondaryUser(); 
-						//Set<SecondaryUser> secondaryUserList = createdByUser.get().getSecondaryUser();
-//						if(secondaryUserList == null) {
-//							secondaryUserList = new HashSet<>();
-//						}
-//						secondaryUserList.add(secondaryUser);
-						
-						User primaryuser =  new User(userRes.getCreatedByUser(),userRes.getCreatedByUser());
-						secondaryUser.setPrimaryUser(primaryuser);
-						secondaryUser.setSecondaryUser(userRes);
-						
-						secondaryUserService.save(secondaryUser);
-				
-	
-					}
-					
-				}
-				userResponseEntity.getData().setTimeTracking(timeTrackingList);
-				userResponseEntity.getData().setUserType(ut);
-				userResponseEntity.setStatusCode(200);
-				userResponseEntity.setErrorCode(null);
-				userResponseEntity.setDescription("User Created Successfully.Please check your mail for Login Credentials");
-				
-				
-				
-				
-				
-			
-		} 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
-		}
-		
-		
-		
-		
-		if(response.isEmpty()) {
-			UserResEntity userResponseEntity = new UserResEntity();
-			userResponseEntity.setErrorCode(400);
-			userResponseEntity.setMessage("Successfully Created");
-			return new ResponseEntity(userResponseEntity, HttpStatus.OK);
-		}else {
-			String descrption = null;
-			 for(UserResponseEntity res :  response)
-			 {     
-				 if(descrption != null) 
-				 {
-					 descrption = descrption +","+ res.getName();
-				 }else {
-					 descrption =  res.getName();
-				 }
-				 
-			 }
-			 UserResEntity userResponseEntity = new UserResEntity();
-			 userResponseEntity.setStatusCode(409);
-			 userResponseEntity.setDescription(descrption +" " +"User  is Already Created for the Organization");
-			 return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-		
-	}
+//
+//			}
+//
+//		}
+////		Organization organization = new Organization(userRequestEntity.getOrganization());
+////		Organization organizationSaved = organizationService.save(organization);
+////		if (userRequestEntity.getOrganization().getAttachment() == null) {
+////		} else {
+////			Attachment att = new Attachment(userRequestEntity.getOrganization().getAttachment(), organizationSaved);
+////			organizationSaved.setAttachment(att);
+////			att.setOrganization(organizationSaved);
+////			attachmentService.save(att);
+////		}
+////		if (organizationSaved.getAttachment() != null) {
+////
+////			String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
+////					.path(organizationSaved.getAttachment().getAttachmentId().toString()).toUriString();
+////
+////			String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
+////					.path(organizationSaved.getAttachment().getAttachmentId().toString()).toUriString();
+////
+////			organizationSaved.getAttachment().setFileDownloadUrl(fileDownloadUrl);
+////			organizationSaved.getAttachment().setFileViewUrl(fileViewUrl);
+////			organizationService.save(organizationSaved);
+////		}
+//		//System.out.println("time tracking"+ userRequestEntity.getTimeTracking().size());
+//		
+//		
+//		
+//		
+//		
+//		
+//		
+//		
+//		
+//		User user = new User(each, each);
+//		System.out.println("userRequestEntity.getOrganization()"+each.getOrganization());
+//		if(each.getOrganization() != null) {
+//			user.setOrganization(each.getOrganization());
+//		}
+//	
+//		if (user.getAttachment() == null) {
+//		} else {
+//			
+//			Attachment att = new Attachment(user.getAttachment());
+//			user.setAttachment(att);
+//			att.setUser(user);
+//		}
+//		List<User> userList = userService.findAllByPhoneNumberOrAlternatePhoneNumber(each.getPhoneNumber(),
+//				each.getAlternatePhoneNumber());
+//		if (userList.size()==0) {
+////			return postUser(user);
+//		} else {
+//			
+//			
+//			UserResponseEntity res = new UserResponseEntity(each);
+//			System.out.println("RESPONSE" + res.getPhoneNumber());
+//			res.setDescription(res.getPhoneNumber() + " Phone exists");
+//			response.add(res);
+//			
+//			
+//			
+//			
+////			for (User usr : userList) {
+////				if (usr.getStatus() == null || usr.getStatus().equals("Active") || usr.getStatus().equals("InActive")) {
+////					UserResEntity userResponseEntity = new UserResEntity();
+////					userResponseEntity.setErrorCode(409);
+////					userResponseEntity.setMessage("PhoneNumber already exists");
+////					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+////				}
+////			}
+////			return postUser(user);
+//		}
+//
+//		List<User> userListData = userService.findAllByAlternatePhoneNumberOrPhoneNumber(
+//				each.getPhoneNumber(), each.getAlternatePhoneNumber());
+//		if (userListData.size()==0) {
+////			return postUser(user);
+//		} else {
+//			UserResponseEntity res = new UserResponseEntity(each);
+//			System.out.println("RESPONSE" + res.getPhoneNumber());
+//			res.setDescription(res.getPhoneNumber() + " Phone exists");
+//			response.add(res);
+////			return postUser(user);
+//		}
+//		
+//		List<User> userEmailList = userService.findAllByEmail(
+//				each.getEmail());
+//		if(userEmailList.size()==0) {
+//			
+//		}else {
+//			String description="";
+//			UserResponseEntity res = new UserResponseEntity(each);
+//			System.out.println("RESPONSE" + res.getEmail());
+//			description=res.getEmail() + " Email Exists";
+////			List<User> userList1 = userService.findAllByPhoneNumberOrAlternatePhoneNumber(each.getPhoneNumber(),
+////					each.getAlternatePhoneNumber());
+////			if(userList1 != null) {
+////				description += "," + user.getPhoneNumber() + " Phone Exists " ;
+////			}
+//			res.setDescription(description);
+////			res.setDescription(res.getEmail() + " Email Exists");
+//			response.add(res);
+//		}
+//		
+//		
+//		int otp = otpService.generateOTP(user.getPhoneNumber());
+//		if (otp == 0) {
+//		} else {
+//			if (user.getAuthenticationType().equalsIgnoreCase("sms")) {
+//				sendSms("Your One Time Password(OTP) is " + otp, user.getPhoneNumber());
+//
+//			} else if (user.getAuthenticationType().equalsIgnoreCase("Email")) {
+//				emailservice.sendOTPMail(user);
+//
+//			}
+//		}
+//
+////		int otp = otpService.generateOTP(userRequestEntity.getPhoneNumber());
+////		if (otp == 0) {
+////		} else {
+////			if (userRequestEntity.getAuthenticationType().equalsIgnoreCase("sms")) {
+////				sendSms("Your One Time Password(OTP) is " + otp, userRequestEntity.getPhoneNumber());
+////
+//////			} else(userRequestEntity.getAuthenticationType().equalsIgnoreCase("Email")) {
+//////				emailService.sendOTPMail(newUsersList);
+//////
+//////			}
+////		}
+//		
+//		
+//		
+//		Set<UserType> userTypes=each.getUserType();
+//		for(UserType users:userTypes) {
+//			if(users.getUserTypeId()==1) {
+//				  System.out.println("Manager");
+//				List<User> use=userService.findEmployeeByUserTypeAndOrganization(users,each.getOrganization());
+//				     
+//				if(use.isEmpty()==false) {
+//					 System.out.println("has no manager");
+//					UserResEntity userResponseEntity = new UserResEntity();
+//					userResponseEntity.setErrorCode(409);
+//					userResponseEntity.setMessage("Manager already exists in the Organization");
+//					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT); 
+//					
+//				
+//			}
+//		}
+//			
+//		}
+//		
+//		
+//		System.out.println("User :" + user);
+//		Optional<User> userData = userService.createUser(user);
+//		System.out.println("userData " + userData);
+////		Optional<User> createdByUser = userService.findById(user.getCreatedByUser());
+////		System.out.println("createdByUser " + createdByUser.get());
+//		if (userData.isPresent()) {
+//			Long code = 1000 + userData.get().getUserId();
+//			userData.get().setPasscode(code);
+//			Set<UserType> usertypelist =userData.get().getUserType();
+//			    UserType  userType = usertypelist.stream().findFirst().get();
+//			    
+//			
+//		             if(userType.getUserTypeId() == 1) 
+//		             {		            	  
+//		            	 Long createdbyuser = userData.get().getUserId();		            	
+//		            	 userData.get().setCreatedByUser(createdbyuser);
+//		            	 
+//		             }
+//			
+//
+//			if (user.getAttachment() != null) {
+//				String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download_image/")
+//						.path(userData.get().getAttachment().getAttachmentId().toString()).toUriString();
+//
+//				String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
+//						.path(userData.get().getAttachment().getAttachmentId().toString()).toUriString();
+//				userData.get().getAttachment().setFileDownloadUrl(fileDownloadUrl);
+//				userData.get().getAttachment().setFileViewUrl(fileViewUrl);
+//			}
+//
+//		User userRes = userService.updatePassCode(userData.get());
+////			if (userRes == null) {
+////				System.out.println("Check");
+////				UserResEntity userResponseEntity = new UserResEntity();
+////				userResponseEntity.setErrorCode(400);
+////				userResponseEntity.setMessage("Unable to create User");
+////				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+////			} else {
+//				
+//				
+//		
+////				try {
+////					SimpleMailMessage leaveCreatedEmail = new SimpleMailMessage();
+////					leaveCreatedEmail.setSubject("TrackSupervisor app Login Credentials from Jesperapps");
+////					leaveCreatedEmail.setText("Login Credentials: \n Your Login Passcode is: " + userRes.getPasscode());
+////					leaveCreatedEmail.setFrom("track@jespersoft.com");
+////					leaveCreatedEmail.setTo(userRes.getEmail());
+////					emailservice.sendEmail(leaveCreatedEmail);
+////				} catch (Exception ex) {
+////					System.out.println("ex" + ex);
+//////					UserResEntity userResponseEntity = new UserResEntity();
+//////					userResponseEntity.setErrorCode(400);
+//////					userResponseEntity.setMessage("Unable to Send Mail");
+//////					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+////				}
+//				UserRequestEntity userReqEntity = new UserRequestEntity(userData.get());
+//				UserResEntity userResponseEntity = new UserResEntity(userReqEntity);
+//				Set<UserType> ut = new HashSet<UserType>();
+//				for (UserType ut1 : userResponseEntity.getData().getUserType()) {
+//					UserType uType = new UserType(ut1);
+//					ut.add(uType);
+//				}
+//				List<TimeTracking> timeTrackingList = new ArrayList<TimeTracking>();
+//				if(userResponseEntity.getData().getTimeTracking() != null)
+//				{
+//					for (TimeTracking t : userResponseEntity.getData().getTimeTracking()) {
+//						TimeTracking timeTracking = new TimeTracking(t);
+//						timeTrackingList.add(timeTracking);
+//					}
+//				}
+//				
+//				
+//				
+//		for(UserType each1:userRes.getUserType()) {
+//					
+//					if((each1.getUserTypeId()==2 || each1.getUserTypeId()==3) && userRes.getCreatedByUser() != null) {
+//						
+//						SecondaryUser secondaryUser=new SecondaryUser(); 
+//						//Set<SecondaryUser> secondaryUserList = createdByUser.get().getSecondaryUser();
+////						if(secondaryUserList == null) {
+////							secondaryUserList = new HashSet<>();
+////						}
+////						secondaryUserList.add(secondaryUser);
+//						
+//						User primaryuser =  new User(userRes.getCreatedByUser(),userRes.getCreatedByUser());
+//						secondaryUser.setPrimaryUser(primaryuser);
+//						secondaryUser.setSecondaryUser(userRes);
+//						
+//						secondaryUserService.save(secondaryUser);
+//				
+//	
+//					}
+//					
+//				}
+//				userResponseEntity.getData().setTimeTracking(timeTrackingList);
+//				userResponseEntity.getData().setUserType(ut);
+//				userResponseEntity.setStatusCode(200);
+//				userResponseEntity.setErrorCode(null);
+//				userResponseEntity.setDescription("User Created Successfully.Please check your mail for Login Credentials");
+//				
+//				
+//				
+//				
+//				
+//			
+//		} 
+//		
+//		
+//		
+//		
+//		
+//		
+//		
+//		
+//		
+//	
+//		}
+//		
+//		
+//		
+//		
+//		if(response.isEmpty()) {
+//			UserResEntity userResponseEntity = new UserResEntity();
+//			userResponseEntity.setErrorCode(400);
+//			userResponseEntity.setMessage("Successfully Created");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.OK);
+//		}else {
+//			String descrption = null;
+//			 for(UserResponseEntity res :  response)
+//			 {     
+//				 if(descrption != null) 
+//				 {
+//					 descrption = descrption +","+ res.getName();
+//				 }else {
+//					 descrption =  res.getName();
+//				 }
+//				 
+//			 }
+//			 UserResEntity userResponseEntity = new UserResEntity();
+//			 userResponseEntity.setStatusCode(409);
+//			 userResponseEntity.setDescription(descrption +" " +"User  is Already Created for the Organization");
+//			 return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
+//		
+//}
 	
 	
 	
@@ -948,6 +1176,8 @@ public class UserController {
 		if (userDatas.isPresent()) {
 			User users = new User(userRequestEntity.getUserId(), userRequestEntity);
 			users.setCreatedByUser(userDatas.get().getCreatedByUser());
+			System.out.println("UserType :" + users.getUserType());
+			
 			if (userRequestEntity.getAttachment() == null) {
 			} else {
 				if (userDatas.get().getAttachment() == null) {
@@ -964,10 +1194,14 @@ public class UserController {
 				} else {
 					Attachment attachment = new Attachment(userRequestEntity.getAttachment());
 					users.setAttachment(attachment);
+					
 				}
 			}
 			users.setPasscode(userDatas.get().getPasscode());
+			System.out.println("Users :" + users.getUserId());
 			User userData = userService.save(users);
+			
+			
 			if (userData != null) {
 				UserRequestEntity userReqEntity = new UserRequestEntity(userData);
 				UserResEntity userResponseEntity = new UserResEntity(userReqEntity);
@@ -995,68 +1229,143 @@ public class UserController {
 	}
 
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@PutMapping("/user-update/{userId}")
-	public ResponseEntity userUpdate(@RequestBody UserRequestEntity userRequestEntity) {
-		if (userRequestEntity.getUserId() == null) {
-			UserResponseEntity userResponseEntity = new UserResponseEntity();
-			userResponseEntity.setStatusCode(404);
-			userResponseEntity.setDescription("UserId Not Found");
-			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
-		}
-		User userDatas = userService.findByUserId(userRequestEntity.getUserId());
-		if (userDatas != null) {
-			User users = new User(userRequestEntity,userDatas);
-			System.out.println("Users :" +users);
-//			users.setCreatedByUser(userDatas.get().getCreatedByUser());
-//			if (userRequestEntity.getAttachment() == null) {
-//			} else {
-//				if (userDatas.get().getAttachment() == null) {
-//					Attachment attachment = new Attachment(userRequestEntity.getAttachment());
-//					Attachment att = attachmentService.save(attachment);
-//					String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-//							.path("/download_image/").path(att.getAttachmentId().toString()).toUriString();
-//
-//					String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
-//							.path(att.getAttachmentId().toString()).toUriString();
-//					att.setFileDownloadUrl(fileDownloadUrl);
-//					att.setFileViewUrl(fileViewUrl);
-//					users.setAttachment(att);
-//				} else {
-//					Attachment attachment = new Attachment(userRequestEntity.getAttachment());
-//					users.setAttachment(attachment);
-//				}
-//			}
-//			users.setPasscode(userDatas.get().getPasscode());
-			System.out.println("UserDatas "+ userDatas);
-			User userData = userService.save(users);
-			if (userData != null) {
+	@PostMapping("/multiple/user")
+	public ResponseEntity createWorkPlace(@RequestBody List<UserRequestEntity> userRequestEntity) {
+		UserResponseEntity response=new UserResponseEntity();
+		List<UserResponseEntity> clas=new ArrayList<>();
+		for(UserRequestEntity each:userRequestEntity) {
+			
+			User emailFromDb=		userService.findUserByEmail(each.getEmail());
+				if(emailFromDb == null) {
+					
+					Optional<User> numberFromDb=userService.findByPhoneNumber(each.getPhoneNumber());
 				
+					if(numberFromDb.isPresent()){
+					UserResponseEntity res=new UserResponseEntity(each.getName());	
+//					System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+					   clas.add(res);
+//					return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
+				}else {
+					User user = new User(each);
+					User savedUsers = userService.save(user);
+				}
+			}else {
+
+				UserResponseEntity res=new UserResponseEntity(each.getName());	
+//				System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+				   clas.add(res);
 				
-				UserResponseEntity userResponseEntity = new UserResponseEntity(userData);
-//				UserType uTypes = userRequestEntity.getUserType();
-//				for (UserType ut : userResponseEntity.getData().getUserType()) {
-//					UserType userType = new UserType(ut, ut);
-//					uTypes.add(userType);
-//				}
-//				userResponseEntity.setUserType(uTypes);
-				userResponseEntity.setStatusCode(200);
-				userResponseEntity.setDescription("User Updated Successfully");
-				return new ResponseEntity(userResponseEntity, HttpStatus.OK);
-			} else {
-				UserResponseEntity userResponseEntity = new UserResponseEntity();
-				userResponseEntity.setStatusCode(400);
-				userResponseEntity.setDescription("Unable to Update User");
-				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 			}
-		} else {
-			UserResponseEntity userResponseEntity = new UserResponseEntity();
-				userResponseEntity.setStatusCode(404);
-				userResponseEntity.setDescription("User Not Found");
-				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+			
+			
+			
+////			List<User>	userFromDb = userService.findAllByOrganization(each.getOrganization());	
+//			if(userFromDb.isEmpty()) {
+//				User user = new User(each);
+//				User holidays = userService.save(user);
+//
+//			
+//		}else {
+////		System.out.println("checking else");
+//			UserResponseEntity res=new UserResponseEntity(userFromDb.get(0));	
+////				System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+//				   clas.add(res);
+//			
+//		}
+	
 		}
+		if(clas.isEmpty()) {
+			response.setStatusCode(200);
+			response.setDescription("Successfully Created");
+			return new ResponseEntity(response, HttpStatus.OK);
+		}else {
+			 String descrption = null;
+			 for(UserResponseEntity cl :  clas)
+			 {     
+//				 System.out.println("Before");
+				 if(descrption != null) 
+				 {
+//					 System.out.println("if");
+					 descrption = descrption +","+ cl.getName();
+				 }else {
+					 descrption =   cl.getName();
+				 }
+				 System.out.println("Description "+ descrption);
+			 }
+			response.setStatusCode(409);
+			response.setDescription(descrption +" " +"user  is Already exists");
+			return new ResponseEntity(response, HttpStatus.CONFLICT);
+		}
+		
 	}
 	
+	
+	
+	
+	
+	
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	@PutMapping("/user-update/{userId}")
+//	public ResponseEntity userUpdate(@RequestBody UserRequestEntity userRequestEntity) {
+//		if (userRequestEntity.getUserId() == null) {
+//			UserResponseEntity userResponseEntity = new UserResponseEntity();
+//			userResponseEntity.setStatusCode(404);
+//			userResponseEntity.setDescription("UserId Not Found");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
+//		User userDatas = userService.findByUserId(userRequestEntity.getUserId());
+//		if (userDatas != null) {
+//			User users = new User(userRequestEntity,userDatas);
+//			System.out.println("Users :" +users);
+////			users.setCreatedByUser(userDatas.get().getCreatedByUser());
+////			if (userRequestEntity.getAttachment() == null) {
+////			} else {
+////				if (userDatas.get().getAttachment() == null) {
+////					Attachment attachment = new Attachment(userRequestEntity.getAttachment());
+////					Attachment att = attachmentService.save(attachment);
+////					String fileDownloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+////							.path("/download_image/").path(att.getAttachmentId().toString()).toUriString();
+////
+////					String fileViewUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/view_image/")
+////							.path(att.getAttachmentId().toString()).toUriString();
+////					att.setFileDownloadUrl(fileDownloadUrl);
+////					att.setFileViewUrl(fileViewUrl);
+////					users.setAttachment(att);
+////				} else {
+////					Attachment attachment = new Attachment(userRequestEntity.getAttachment());
+////					users.setAttachment(attachment);
+////				}
+////			}
+////			users.setPasscode(userDatas.get().getPasscode());
+//			System.out.println("UserDatas "+ userDatas);
+//			User userData = userService.save(users);
+//			if (userData != null) {
+//				
+//				
+//				UserResponseEntity userResponseEntity = new UserResponseEntity(userData);
+////				UserType uTypes = userRequestEntity.getUserType();
+////				for (UserType ut : userResponseEntity.getData().getUserType()) {
+////					UserType userType = new UserType(ut, ut);
+////					uTypes.add(userType);
+////				}
+////				userResponseEntity.setUserType(uTypes);
+//				userResponseEntity.setStatusCode(200);
+//				userResponseEntity.setDescription("User Updated Successfully");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.OK);
+//			} else {
+//				UserResponseEntity userResponseEntity = new UserResponseEntity();
+//				userResponseEntity.setStatusCode(400);
+//				userResponseEntity.setDescription("Unable to Update User");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//			}
+//		} else {
+//			UserResponseEntity userResponseEntity = new UserResponseEntity();
+//				userResponseEntity.setStatusCode(404);
+//				userResponseEntity.setDescription("User Not Found");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
+//	}
+//	
 	
 	
 	
@@ -1306,7 +1615,8 @@ public class UserController {
 				
 				if (each.getSecondaryUser().getStatus() == null || each.getSecondaryUser().getStatus().equals("Active") || each.getSecondaryUser().getStatus().equals("InActive")
 						|| each.getSecondaryUser().getStatus().equals("Pending") || each.getSecondaryUser().getStatus().equals("Hold")) {
-					UserRequestEntity userRequestEntity = new UserRequestEntity(each, each.getSecondaryUser());
+//					UserRequestEntity userRequestEntity = new UserRequestEntity(each, each.getSecondaryUser());
+					UserResponseEntity userResponseEntity = new UserResponseEntity(each, each.getSecondaryUser());
 					if (each.getSecondaryUser().getAttachment() == null) {
 
 					} else {
@@ -1336,7 +1646,7 @@ public class UserController {
 					}
 
 					each.getSecondaryUser().setUserType(userTypes);
-					UserResponseEntity userResponseEntity = new UserResponseEntity(userRequestEntity);
+					
 					userResponseEntity1.add(userResponseEntity);
 				}
 			}

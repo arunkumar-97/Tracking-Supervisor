@@ -25,7 +25,7 @@ public class OrganizationRequestEntity {
 	private String fiscalYearStart;
 	private String defaulTimezone;
 	private String reportingCurrency;
-	private State state;
+	private State states;
 	private Country country;
 	private City city;
 	private Attachment attachment;
@@ -115,11 +115,12 @@ public class OrganizationRequestEntity {
 	public void setReportingCurrency(String reportingCurrency) {
 		this.reportingCurrency = reportingCurrency;
 	}
-	public State getState() {
-		return state;
+	
+	public State getStates() {
+		return states;
 	}
-	public void setState(State state) {
-		this.state = state;
+	public void setStates(State states) {
+		this.states = states;
 	}
 	public Country getCountry() {
 		return country;

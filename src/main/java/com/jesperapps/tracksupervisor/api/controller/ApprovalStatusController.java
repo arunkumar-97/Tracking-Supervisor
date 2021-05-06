@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jesperapps.tracksupervisor.api.extra.Response;
 import com.jesperapps.tracksupervisor.api.message.ApprovalStatusResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.ApprovalStatus;
-import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.repository.ApprovalStatusRepository;
 import com.jesperapps.tracksupervisor.api.utils.ApprovalsStatus;
 

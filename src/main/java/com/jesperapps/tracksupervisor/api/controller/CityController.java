@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jesperapps.tracksupervisor.api.message.CityResponseEntity;
-import com.jesperapps.tracksupervisor.api.message.StateResponseEntity;
-import com.jesperapps.tracksupervisor.api.model.Country;
+
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.service.CityService;
 import com.jesperapps.tracksupervisor.api.service.StateService;

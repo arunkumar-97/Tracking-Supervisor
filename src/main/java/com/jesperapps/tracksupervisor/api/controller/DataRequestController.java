@@ -160,6 +160,7 @@ public class DataRequestController {
 	//
 	@GetMapping("/attendance_by_userStatus/{userId}")
 	public ResponseEntity listUserByUserStatusOnlyIfAttendanceFoundForRequestedTime(@PathVariable("userId") Long userId) {
+		
 		User user = new User(userId, userId);
 		Attendance attendanceDatas = attendanceService.findByUserStatusAndUser("Active",user);
 		if(attendanceDatas == null) {

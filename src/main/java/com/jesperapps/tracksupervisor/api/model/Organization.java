@@ -39,11 +39,9 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@Size(max = 100)
 	private String organizationName;
 
-	
-
 	@Column(name = "CONTACT_PERSON")
 	@Size(max = 11)
-
+	
 	private String contactPerson;
 
 	@Column(name = "CONTACT_COUNTRY_CODE")
@@ -84,7 +82,7 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 
 	@ManyToOne
 	@JoinColumn(name = "state_Id", referencedColumnName = "stateId")
-	private State state;
+	private State states;
 
 	@ManyToOne
 	@JoinColumn(name = "Country_Id", referencedColumnName = "countryId")
@@ -206,7 +204,7 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		this.reportingCurrency = organizationRequestEntity.getReportingCurrency();
 		this.gstNumber=organizationRequestEntity.getGstNumber();
 		this.country=organizationRequestEntity.getCountry();
-		this.state=organizationRequestEntity.getState();
+		this.states=organizationRequestEntity.getStates();
 		this.city=organizationRequestEntity.getCity();
 		if (organizationRequestEntity.getAttachment() == null) {
 
@@ -231,8 +229,6 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
 	}
-
-	
 
 	public IndustryType getIndustryType() {
 		return industryType;
@@ -299,11 +295,11 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	}
 
 	public State getState() {
-		return state;
+		return states;
 	}
 
 	public void setState(State state) {
-		this.state = state;
+		this.states = state;
 	}
 
 	public City getCity() {
@@ -370,16 +366,16 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		this.gstNumber = gstNumber;
 	}
 
-	@Override
-	public String toString() {
-		return "Organization [organizationId=" + organizationId + ", organizationName=" + organizationName
-				+ ", industryType=" + industryType + ", contactPerson=" + contactPerson + ", contactCountryCode="
-				+ contactCountryCode + ", contactPhoneNumber=" + contactPhoneNumber + ", contactEmail=" + contactEmail
-				+ ", address=" + address + ", postalCode=" + postalCode + ", fiscalYearStart=" + fiscalYearStart
-				+ ", defaulTimezone=" + defaulTimezone + ", reportingCurrency=" + reportingCurrency + ", gstNumber="
-				+ gstNumber + ", state=" + state + ", country=" + country + ", city=" + city + ", attachment="
-				+ attachment + ", user=" + user + ", status=" + status + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "Organization [organizationId=" + organizationId + ", organizationName=" + organizationName
+//				+ ", industryType=" + industryType + ", contactPerson=" + contactPerson + ", contactCountryCode="
+//				+ contactCountryCode + ", contactPhoneNumber=" + contactPhoneNumber + ", contactEmail=" + contactEmail
+//				+ ", address=" + address + ", postalCode=" + postalCode + ", fiscalYearStart=" + fiscalYearStart
+//				+ ", defaulTimezone=" + defaulTimezone + ", reportingCurrency=" + reportingCurrency + ", gstNumber="
+//				+ gstNumber + ", state=" + state + ", country=" + country + ", city=" + city + ", attachment="
+//				+ attachment + ", user=" + user + ", status=" + status + "]";
+//	}
 
 
 

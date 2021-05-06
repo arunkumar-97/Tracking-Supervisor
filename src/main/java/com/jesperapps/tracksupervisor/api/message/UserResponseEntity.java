@@ -9,6 +9,7 @@ import com.jesperapps.tracksupervisor.api.model.Attendance;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
 import com.jesperapps.tracksupervisor.api.model.User;
@@ -27,17 +28,15 @@ public class UserResponseEntity extends BaseResponse{
 	private String userStatus;
 	private String address;
 	private String postalCode;
-	private State state;
+	private State states;
 	private Country country;
 	private City city;
 	private Long createdByUser;
-
 	private Set<UserType> userType;
 	private Attachment attachment;
 	private Set<Attendance> userData;
 	private Set<Attendance> attendance;
 	private List<TimeTracking> timeTracking;
-	
 	private Organization organization;
 
 	
@@ -80,10 +79,11 @@ public class UserResponseEntity extends BaseResponse{
 	}
 
 	public UserResponseEntity(User userDatas, User userDatas2) {
+		
 	this.userId = userDatas.getUserId();
 	this.userStatus = userDatas.getUserStatus();
 	this.name = userDatas.getName();
-	this.passcode = userDatas.getPasscode();
+//	this.passcode = userDatas.getPasscode();
 	this.phoneNumber = userDatas.getPhoneNumber();
 	this.email = userDatas.getEmail();
 	this.alternatePhoneNumber = userDatas.getAlternatePhoneNumber();
@@ -91,12 +91,45 @@ public class UserResponseEntity extends BaseResponse{
 	this.userType = userDatas.getUserType();
 	this.attachment = userDatas.getAttachment();
 	this.createdByUser = userDatas.getCreatedByUser();
-	this.organization = userDatas.getOrganization();
+	this.city=userDatas.getCity();
+	this.states=userDatas.getState();
+	this.country=userDatas.getCountry();
+	this.address=userDatas.getAddress();
+	this.postalCode=userDatas.getPostalCode();
+	if(userDatas.getOrganization() != null) {
+		this.organization = userDatas.getOrganization();
+	}else {
+		this.organization =new Organization();
+	}
+	
 	}
 	
 	
 	
 	
+
+	public UserResponseEntity(SecondaryUser each, User secondaryUser) {
+		this.userId = secondaryUser.getUserId();
+		this.userType = secondaryUser.getUserType();
+		this.createdByUser = secondaryUser.getCreatedByUser();
+		this.timeTracking  = secondaryUser.getTimeTracking();
+		this.phoneNumber=secondaryUser.getPhoneNumber();
+		this.alternatePhoneNumber=secondaryUser.getAlternatePhoneNumber();
+		this.city=secondaryUser.getCity();
+		this.states=secondaryUser.getState();
+		this.country=secondaryUser.getCountry();
+		this.postalCode=secondaryUser.getPostalCode();
+		this.address=secondaryUser.getAddress();
+		this.organization = secondaryUser.getOrganization();
+		this.email = secondaryUser.getEmail();
+		this.name = secondaryUser.getName();
+		this.createdByUser = secondaryUser.getCreatedByUser();
+	}
+
+	public UserResponseEntity(String name2) {
+		// TODO Auto-generated constructor stub
+		this.name=name2;
+	}
 
 	public String getAddress() {
 		return address;
@@ -114,12 +147,14 @@ public class UserResponseEntity extends BaseResponse{
 		this.postalCode = postalCode;
 	}
 
-	public State getState() {
-		return state;
+	
+
+	public State getStates() {
+		return states;
 	}
 
-	public void setState(State state) {
-		this.state = state;
+	public void setStates(State states) {
+		this.states = states;
 	}
 
 	public Country getCountry() {
