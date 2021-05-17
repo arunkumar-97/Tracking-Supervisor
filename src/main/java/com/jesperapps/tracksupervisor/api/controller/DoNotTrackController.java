@@ -47,17 +47,10 @@ public class DoNotTrackController {
 		Response response=new Response();
 		DoNotTrack trackFromDb=doNotTrackService.findByUser_userIdAndFromDateAndToDate(reqEntity.getUser().getUserId(),reqEntity.getFromDate(),reqEntity.getToDate());
 				if(trackFromDb != null) {
+					
 					if(trackFromDb.getApprovalstatus().getApprovalStatusId()== 3 ) {
-						
-						
-						
-						
-						
 						DoNotTrack doNotTrack=new DoNotTrack(reqEntity);
 						doNotTrackService.save(doNotTrack);
-						
-						
-						
 						response.setStatusCode(200);
 						response.setDescription("Created Successfully");
 						return response;

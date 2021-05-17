@@ -43,6 +43,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	List<User> findAllByPhoneNumberOrEmail(String phoneNumber, String email);
 
 	User findByUserId(Long userId);
+
+	User findByEmailAndOtp(String email, String otp);
 	
 	
 }

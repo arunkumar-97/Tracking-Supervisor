@@ -92,7 +92,7 @@ public class UserResponseEntity extends BaseResponse{
 	this.attachment = userDatas.getAttachment();
 	this.createdByUser = userDatas.getCreatedByUser();
 	this.city=userDatas.getCity();
-	this.states=userDatas.getState();
+	this.states=userDatas.getStates();
 	this.country=userDatas.getCountry();
 	this.address=userDatas.getAddress();
 	this.postalCode=userDatas.getPostalCode();
@@ -116,7 +116,7 @@ public class UserResponseEntity extends BaseResponse{
 		this.phoneNumber=secondaryUser.getPhoneNumber();
 		this.alternatePhoneNumber=secondaryUser.getAlternatePhoneNumber();
 		this.city=secondaryUser.getCity();
-		this.states=secondaryUser.getState();
+		this.states=secondaryUser.getStates();
 		this.country=secondaryUser.getCountry();
 		this.postalCode=secondaryUser.getPostalCode();
 		this.address=secondaryUser.getAddress();

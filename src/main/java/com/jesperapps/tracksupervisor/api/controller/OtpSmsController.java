@@ -148,6 +148,7 @@ public class OtpSmsController {
 				List<OtpSms> otpSms = otpSmsService.findAll();
 				if (otpSms.isEmpty()) {
 //					System.out.println("otp empty");
+//					otpSmsService.clearOTP(phoneNumber);
 					int otp = otpSmsService.generateOTP(phoneNumber.get().getPhoneNumber());
 					if (otp == 0) {
 //						ObjectNode jsonObject = objectMapper.createObjectNode();
@@ -182,7 +183,7 @@ public class OtpSmsController {
 
 					}
 				} else {
-//					System.out.println("else otp empty");
+					System.out.println("else otp empty");
 					otpSmsService.clearOTP(phone);
 					int otp = otpSmsService.generateOTP(phoneNumber.get().getPhoneNumber());
 					if (otp == 0) {

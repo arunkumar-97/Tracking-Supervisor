@@ -17,7 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import com.jesperapps.tracksupervisor.api.message.AdminOrgReqEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizataionWithUserRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationResponseEntity;
@@ -307,6 +307,13 @@ public class OrganizationServiceImpl implements OrganizationService{
 	public Organization findByOrganizationId(Integer organizationId) {
 		// TODO Auto-generated method stub
 		return organizationRepository.findByOrganizationId(organizationId);
+	}
+
+	@Override
+	public Organization addOrganization(AdminOrgReqEntity organizationRequestEntity) {
+		Organization organization = new Organization(organizationRequestEntity,organizationRequestEntity);
+		organizationRepository.save(organization);
+		return organization;
 	}
 
 

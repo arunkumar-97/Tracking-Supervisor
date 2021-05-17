@@ -45,6 +45,11 @@ public class WorkPlace {
 	@ManyToOne
 	@JoinColumn
 	private Status status;
+	
+	
+	@ManyToOne
+	@JoinColumn(name="locationDetails_Id")
+	private LocationDetails locationDetails;
 
 	public WorkPlace() {
 
@@ -63,6 +68,7 @@ public class WorkPlace {
 		this.startTime=workPlaceReqEntity.getStartTime();
 		this.endTime=workPlaceReqEntity.getEndTime();
 		this.timeInterval=workPlaceReqEntity.getTimeInterval();
+		this.locationDetails=workPlaceReqEntity.getLocationDetails();
 	}
 
 	public WorkPlace(WorkPlace workPlace) {
@@ -158,9 +164,20 @@ public class WorkPlace {
 		this.status = status;
 	}
 
-	@Override
-	public String toString() {
-		return "WorkPlace [workPlaceId=" + workPlaceId + ", fromDate=" + fromDate + ", toDate=" + toDate + "]";
+	public LocationDetails getLocationDetails() {
+		return locationDetails;
 	}
+
+	public void setLocationDetails(LocationDetails locationDetails) {
+		this.locationDetails = locationDetails;
+	}
+	
+	
+	
+
+//	@Override
+//	public String toString() {
+//		return "WorkPlace [workPlaceId=" + workPlaceId + ", fromDate=" + fromDate + ", toDate=" + toDate + "]";
+//	}
 
 }

@@ -63,6 +63,10 @@ public interface UserService {
 
 	List<OtpResponse> validateOTP(List<OtpRequest> emailOtpRequest);
 
+	boolean checkOtpIsSame(String otp, String otp2);
+
+	User findByEmailAndOtp(String email, String otp);
+
 	
 
 }

@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.jesperapps.tracksupervisor.api.model.Address;
+import com.jesperapps.tracksupervisor.api.model.LocationDetails;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
 
@@ -26,7 +27,7 @@ public class WorkPlaceRequestEntity {
 	
 	private List<Address> address;
 	private Status status;
-	
+	private LocationDetails locationDetails;
 	
 	
 
@@ -108,6 +109,16 @@ public class WorkPlaceRequestEntity {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	
+	
+
+	public LocationDetails getLocationDetails() {
+		return locationDetails;
+	}
+
+	public void setLocationDetails(LocationDetails locationDetails) {
+		this.locationDetails = locationDetails;
 	}
 
 	@Override

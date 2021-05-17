@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import com.jesperapps.tracksupervisor.api.model.ApprovalStatus;
 import com.jesperapps.tracksupervisor.api.repository.ApprovalStatusRepository;
 import com.jesperapps.tracksupervisor.api.utils.ApprovalsStatus;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class ApprovalStatusController {
 

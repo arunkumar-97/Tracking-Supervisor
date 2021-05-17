@@ -21,7 +21,7 @@ public class OtpSmsServiceImpl implements OtpSmsService {
 	
 	
 	
-	private static final Integer EXPIRE_MINS = 3;
+	private static final Integer EXPIRE_MINS = 7;
 
 	@Override
 	public int generateOTP(String phoneNumber) {
@@ -46,7 +46,8 @@ public class OtpSmsServiceImpl implements OtpSmsService {
 		System.out.println("test claeR");
 		try {
 			 System.out.println("try claer");
-			return otpSmsRepository.deleteByPhoneNumber(phone);
+			 System.out.println("phone :" + phone );
+			return this.deleteByPhoneNumber(phone);
 			 
 //			 System.out.println("otpSms"+otpSms);
 			 

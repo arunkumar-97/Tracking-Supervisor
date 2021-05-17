@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 
+import com.jesperapps.tracksupervisor.api.message.AdminOrgReqEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizataionWithUserRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationResponseEntity;
@@ -29,6 +30,8 @@ public interface OrganizationService {
 	Organization findByOrganizationName(String organizationName);
 
 	Organization findByOrganizationId(Integer organizationId);
+
+	Organization addOrganization(AdminOrgReqEntity organizationRequestEntity);
 	
 
 //	OrganizationDemo findByName(String organizationName);

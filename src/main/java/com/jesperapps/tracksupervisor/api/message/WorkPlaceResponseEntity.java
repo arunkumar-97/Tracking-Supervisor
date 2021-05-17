@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.jesperapps.tracksupervisor.api.extra.BaseResponse;
 import com.jesperapps.tracksupervisor.api.model.Address;
+import com.jesperapps.tracksupervisor.api.model.LocationDetails;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.WorkPlace;
@@ -23,7 +24,7 @@ public class WorkPlaceResponseEntity extends BaseResponse{
 	private User assignedToUser;
 	private List<Address> address;
 	private Status status;
-	
+	private LocationDetails locationDetails;
 	public WorkPlaceResponseEntity() {
 		
 	}
@@ -117,6 +118,18 @@ public class WorkPlaceResponseEntity extends BaseResponse{
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	
+	
+	public LocationDetails getLocationDetails() {
+		return locationDetails;
+	}
+
+
+	public void setLocationDetails(LocationDetails locationDetails) {
+		this.locationDetails = locationDetails;
+	}
+
+
 	@Override
 	public String toString() {
 		return "WorkPlaceResponseEntity [workPlaceId=" + workPlaceId + ", fromDate=" + fromDate + ", toDate=" + toDate

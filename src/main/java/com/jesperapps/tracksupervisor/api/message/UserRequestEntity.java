@@ -38,6 +38,7 @@ public class UserRequestEntity {
 	private Set<Attendance> userData;
 	private List<TimeTracking> timeTracking;
 	private Organization organization;
+	private String otp;
 
 	public UserRequestEntity() {
 	
@@ -290,6 +291,16 @@ public class UserRequestEntity {
 
 	public void setAuthenticationType(String authenticationType) {
 		this.authenticationType = authenticationType;
+	}
+	
+	
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
 	}
 
 	@Override

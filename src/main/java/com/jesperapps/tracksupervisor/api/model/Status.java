@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Status {
 
@@ -14,17 +16,33 @@ public class Status {
 	private Long statusId;
 	private String statusName;
 
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
 	private List<WorkPlace> workPlace;
 	
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
 	private List<Organization> organization;
 	
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
 	private List<Address> address;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
 	private List<DoNotTrack> track;
+	
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
+	private List<FreeTrial> freeTrial;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
+	private List<OrganizationFreeTrial> organizationFreeTrial;
 	
 
 	public Status() {
@@ -92,6 +110,14 @@ public class Status {
 
 	public void setTrack(List<DoNotTrack> track) {
 		this.track = track;
+	}
+
+	public List<FreeTrial> getFreeTrial() {
+		return freeTrial;
+	}
+
+	public void setFreeTrial(List<FreeTrial> freeTrial) {
+		this.freeTrial = freeTrial;
 	}
 	
 	

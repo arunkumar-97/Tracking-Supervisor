@@ -2,18 +2,17 @@ package com.jesperapps.tracksupervisor.api.message;
 
 import java.util.List;
 
-import com.jesperapps.tracksupervisor.api.extra.BaseResponse;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.IndustryType;
-import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
 
-public class OrganizationResponseEntity extends BaseResponse{
-
+public class AdminOrgReqEntity {
+	
 	private Integer organizationId;
 	private String organizationName;
 	private IndustryType industryType;
@@ -29,51 +28,11 @@ public class OrganizationResponseEntity extends BaseResponse{
 	private State states;
 	private Country country;
 	private City city;
-	private Attachment attachment;
-	private List<User> user;
+	private User user;
 	private Status status;
 	private String gstNumber;
+	private FreeTrial freeTrial;
 	
-	public OrganizationResponseEntity() {
-		
-	}
-	
-	
-	public OrganizationResponseEntity(Organization organization) {
-		
-		this.organizationId = organization.getOrganizationId();
-		this.organizationName = organization.getOrganizationName();
-		this.attachment = organization.getAttachment();
-		this.status = organization.getStatus();
-		this.industryType=organization.getIndustryType();
-		this.contactPerson=organization.getContactPerson();
-		this.contactCountryCode=organization.getContactCountryCode();
-		this.contactPhoneNumber=organization.getContactPhoneNumber();
-		this.contactEmail=organization.getContactEmail();
-		this.address=organization.getContactEmail();
-		this.postalCode=organization.getPostalCode();
-		this.fiscalYearStart=organization.getFiscalYearStart();
-		this.defaulTimezone=organization.getDefaulTimezone();
-		this.reportingCurrency=organization.getReportingCurrency();
-		this.states=organization.getStates();
-		this.country=organization.getCountry();
-		this.city=organization.getCity();
-		this.status=organization.getStatus();
-		this.gstNumber=organization.getGstNumber();
-		this.user=organization.getUser();
-	}
-
-
-	public String getGstNumber() {
-		return gstNumber;
-	}
-
-
-	public void setGstNumber(String gstNumber) {
-		this.gstNumber = gstNumber;
-	}
-
-
 	public Integer getOrganizationId() {
 		return organizationId;
 	}
@@ -86,17 +45,12 @@ public class OrganizationResponseEntity extends BaseResponse{
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
 	}
-	
 	public IndustryType getIndustryType() {
 		return industryType;
 	}
-
-
 	public void setIndustryType(IndustryType industryType) {
 		this.industryType = industryType;
 	}
-
-
 	public String getContactPerson() {
 		return contactPerson;
 	}
@@ -151,17 +105,12 @@ public class OrganizationResponseEntity extends BaseResponse{
 	public void setReportingCurrency(String reportingCurrency) {
 		this.reportingCurrency = reportingCurrency;
 	}
-	
 	public State getStates() {
 		return states;
 	}
-
-
 	public void setStates(State states) {
 		this.states = states;
 	}
-
-
 	public Country getCountry() {
 		return country;
 	}
@@ -174,16 +123,10 @@ public class OrganizationResponseEntity extends BaseResponse{
 	public void setCity(City city) {
 		this.city = city;
 	}
-	public Attachment getAttachment() {
-		return attachment;
-	}
-	public void setAttachment(Attachment attachment) {
-		this.attachment = attachment;
-	}
-	public List<User> getUser() {
+	public User getUser() {
 		return user;
 	}
-	public void setUser(List<User> user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 	public Status getStatus() {
@@ -192,6 +135,21 @@ public class OrganizationResponseEntity extends BaseResponse{
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	public String getGstNumber() {
+		return gstNumber;
+	}
+	public void setGstNumber(String gstNumber) {
+		this.gstNumber = gstNumber;
+	}
+	public FreeTrial getFreeTrial() {
+		return freeTrial;
+	}
+	public void setFreeTrial(FreeTrial freeTrial) {
+		this.freeTrial = freeTrial;
+	}
 	
 	
+	
+	
+
 }

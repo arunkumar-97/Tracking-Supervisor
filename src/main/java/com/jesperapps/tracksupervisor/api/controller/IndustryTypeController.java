@@ -12,9 +12,6 @@ import com.jesperapps.tracksupervisor.api.message.IndustryTypeResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.IndustryType;
 import com.jesperapps.tracksupervisor.api.service.IndustryTypeService;
 
-
-
-
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class IndustryTypeController {
@@ -26,7 +23,7 @@ public class IndustryTypeController {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@GetMapping("/industry-type")
-	public ResponseEntity listIndustryType() {
+	public ResponseEntity listIndustryType(){
 		List<IndustryType> industryTypeDatas = industryTypeService.findAll();
 		if (industryTypeDatas.isEmpty()) {
 			IndustryTypeResponseEntity userResponseEntity = new IndustryTypeResponseEntity();

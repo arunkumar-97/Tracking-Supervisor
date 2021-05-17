@@ -4,12 +4,23 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
+import javax.mail.Address;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.slf4j.Logger;
@@ -33,18 +44,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 //import com.jesperapps.schoolmanagement.api.message.Response;
 //import com.jesperapps.schoolmanagement.api.message.SchoolRequest;
 //import com.jesperapps.schoolmanagement.api.model.School;
-
+import com.jesperapps.tracksupervisor.api.message.AdminOrgReqEntity;
+import com.jesperapps.tracksupervisor.api.message.AdminOrgResEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationResponseEntity;
 import com.jesperapps.tracksupervisor.api.message.UserResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.AttachmentByte;
+import com.jesperapps.tracksupervisor.api.model.ConfirmationToken;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.OrganizationFreeTrial;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.UserType;
 import com.jesperapps.tracksupervisor.api.service.AttachmentService;
 import com.jesperapps.tracksupervisor.api.service.EmailService;
+import com.jesperapps.tracksupervisor.api.service.FreeTrialService;
+import com.jesperapps.tracksupervisor.api.service.OrganizationFreeTrialService;
 import com.jesperapps.tracksupervisor.api.service.OrganizationService;
 import com.jesperapps.tracksupervisor.api.service.OtpSmsService;
 import com.jesperapps.tracksupervisor.api.service.UserService;
@@ -70,9 +87,20 @@ public class OrganizationController {
 	
 	@Autowired
 	private OtpSmsService otpService;
+	
+	@Autowired
+	private FreeTrialService freeTrialService;
+	
+	
+	@Autowired
+	private OrganizationFreeTrialService organizationFreeTrialService;
 
 	private Logger logger = LoggerFactory.getLogger("OrganizationController");
 	OrganizationResponseEntity res = new OrganizationResponseEntity();
+	
+	
+//	private final String FROM_ADDRESS = "arun.thril@gmail.com";
+	private final String FROM_ADDRESS = "arun.kumar@jespersoft.com";
 	
 	@PostMapping("/check/organization")
 	public ResponseEntity createCheckOrganization(@RequestBody OrganizationRequestEntity organizationRequestEntity) {
@@ -262,7 +290,7 @@ public class OrganizationController {
 				 userlist.add(createduser);
 				 userResEntity.setUser(userlist);
 				userResEntity.setErrorCode(200);
-				userResEntity.setMessage("Organization Created Successfully");
+				userResEntity.setMessage("Please Check your selected AuthenticationType to verify your OTP ");
 				return new ResponseEntity(userResEntity, HttpStatus.OK);
 				
 				
@@ -271,6 +299,184 @@ public class OrganizationController {
 				userResEntity.setErrorCode(200);
 				userResEntity.setMessage("Organization Already Exists");
 				return new ResponseEntity(userResEntity, HttpStatus.OK);
+		
+			}
+			
+		}
+	
+	
+	
+	@SuppressWarnings("rawtypes")
+	@PostMapping("/organization/superadmin/registration")
+	private ResponseEntity createOrganizationBySuperAdmin(@RequestBody AdminOrgReqEntity organizationRequestEntity) {
+		Organization organizationFromDb	=organizationService.findByOrganizationName(organizationRequestEntity.getOrganizationName());
+//		System.out.println(employeeRequest.getEmpoyeeId());
+		if(organizationFromDb == null) {
+			Organization createdOrganization = null;
+			User createduser = null ;
+				User	newUser=organizationRequestEntity.getUser();
+				
+				System.out.println("user"  + organizationRequestEntity.getUser());
+				
+				User emailFromDb=		userService.findUserByEmail(newUser.getEmail());
+				if(emailFromDb == null) {
+					
+					Optional<User> numberFromDb=userService.findByPhoneNumber(newUser.getPhoneNumber());
+					
+					if(numberFromDb.isEmpty()){
+						
+					}else{
+						UserResponseEntity userResEntity = new UserResponseEntity();
+						userResEntity.setErrorCode(409);
+						userResEntity.setMessage("Phone Number Already Exists");
+						return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
+					
+					}
+				}else {
+					UserResponseEntity userResEntity = new UserResponseEntity();
+					userResEntity.setErrorCode(409);
+					userResEntity.setMessage("Email Already Exists");
+					return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
+				
+					
+				}
+
+				
+				
+				 createdOrganization=organizationService.addOrganization(organizationRequestEntity);
+				if(createdOrganization != null) {
+					
+					Organization organization = new Organization(createdOrganization.getOrganizationId());
+					
+					
+					User user = new User(newUser,newUser,organizationRequestEntity);
+					user.setVerificationStatus(1);
+					user.setStatus("ACTIVE");
+					Set<UserType> userType=new HashSet<>();
+					UserType uType=new UserType();
+					uType.setUserTypeId((long) 1);
+					userType.add(uType);
+					user.setUserType(userType);
+//					System.out.println("Organization " +organization.getOrganizationId());
+					user.setOrganization(organization);
+					createduser = userService.save(user);
+					
+					try{
+
+						
+						Properties props = new Properties();
+
+						
+						props.put("mail.smtp.auth", "true");
+						props.put("mail.smtp.starttls.enable", "true");
+						props.put("mail.smtp.host", "mail.jespersoft.com");
+//						props.put("mail.smtp.host", "smtp.gmail.com");
+//						props.put("mail.smtp.port", "587");
+						props.put("mail.smtp.port", "25");
+
+
+						Authenticator auth = new Authenticator() {
+							protected PasswordAuthentication getPasswordAuthentication() {
+								return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
+//								return new PasswordAuthentication(FROM_ADDRESS,"arunvenkat");
+							}
+						};
+						Session session = Session.getInstance(props, auth);
+						Message msg = new MimeMessage(session);
+						msg.setFrom(new InternetAddress(FROM_ADDRESS, false));
+						List<InternetAddress> list = new ArrayList<InternetAddress>();
+						
+							InternetAddress to1 = new InternetAddress(createduser.getEmail());
+							msg.setRecipient(Message.RecipientType.TO, to1);
+							list.add(to1);
+						
+						Address[] addressTo = list.toArray(new Address[] {});
+						msg.setRecipients(Message.RecipientType.TO, addressTo);
+				
+						
+						msg.setSubject("PRINTLOK LOGIN CREDENTIALS");
+						msg.setText("Hello " + createduser.getName() +".\n "+"Your Login Credentials is "+".\n"+"Email :"+createduser.getEmail() +".\n"
+								
+								+ "Password :" +createduser.getPassword());
+						
+						
+						msg.setSentDate(new Date());
+//						List<InternetAddress> listOfToAddress = new ArrayList<InternetAddress>();
+//						for (String cc : emailReqEntity2.getCc()) {
+//							InternetAddress cc1 = new InternetAddress(cc);
+//							msg.setRecipient(Message.RecipientType.CC, cc1);
+//							listOfToAddress.add(cc1);
+//						}
+//						Address[] address = listOfToAddress.toArray(new Address[] {});
+			//
+//						msg.setRecipients(Message.RecipientType.CC, address);		
+						msg.saveChanges();
+						Transport.send(msg);
+					}
+					catch(Exception e) {
+						System.out.println("Exception :" + e.getMessage());
+						
+					}
+					
+					
+					
+					
+					
+					
+
+					OrganizationFreeTrial orgFreeTrial=new OrganizationFreeTrial();
+					orgFreeTrial.setOrganization(createdOrganization);
+					orgFreeTrial.setFreeTrial(organizationRequestEntity.getFreeTrial());
+					Date date=new Date();
+					orgFreeTrial.setStartDate(date);
+					Optional<FreeTrial> freetrial=freeTrialService.findById(organizationRequestEntity.getFreeTrial().getFreeTrialId());
+//					System.out.println("FreeTrial :" + freetrial);
+					
+					Integer noofdays = freetrial.get().getNoOfDays();
+					Date endate = new Date();
+					    endate.setDate(endate.getDate() + noofdays);
+					    orgFreeTrial.setEndDate(endate);
+					    
+					    
+					    
+					    System.out.println("StartDate :" + date);
+					    System.out.println("StartDate :" + endate);
+					    Status status=new Status();
+					    status.setStatusId((long) 1);
+					    orgFreeTrial.setStatus(status);  
+					    organizationFreeTrialService.save(orgFreeTrial);
+					    
+					}
+		                     
+						
+						
+//					}else {
+//						UserResponseEntity userResEntity=new UserResponseEntity();
+//						userResEntity.setErrorCode(409);
+//						userResEntity.setMessage("User Already Exists");
+//						return new ResponseEntity(userResEntity, HttpStatus.NOT_FOUND);
+//					}
+					
+				
+					//userService.save(user);
+
+				
+				
+			
+				AdminOrgResEntity userResEntity = new AdminOrgResEntity(createdOrganization);
+				User userlist = new User(createduser);
+//				 userlist.add(createduser);
+				 userResEntity.setUser(userlist);
+				userResEntity.setErrorCode(200);
+				userResEntity.setMessage("Organization Created Successfully");
+				return new ResponseEntity(userResEntity, HttpStatus.OK);
+				
+				
+			}else {
+				OrganizationResponseEntity userResEntity = new OrganizationResponseEntity();
+				userResEntity.setErrorCode(409);
+				userResEntity.setMessage("Organization Already Exists");
+				return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
 		
 			}
 			
@@ -350,6 +556,25 @@ public class OrganizationController {
 	
 	@PutMapping("/organization/{organizationId}")
 	public ResponseEntity<Organization> updateOrganization(@RequestBody OrganizationRequestEntity organizationRequestEntity) {
+		Optional<Organization> Id = organizationService.findById(organizationRequestEntity.getOrganizationId());
+		if (Id.isPresent()) {
+			Organization organizationReq = new Organization(organizationRequestEntity);
+			Organization organization = organizationService.save(organizationReq);
+			ObjectNode jsonObject = objectMapper.createObjectNode();
+			jsonObject.put("statusCode", res.SUCCESS);
+			jsonObject.put("description", res.setDescription("Organization Updated Successfully"));
+			return new ResponseEntity(jsonObject, HttpStatus.OK);
+		} else {
+			ObjectNode jsonObject = objectMapper.createObjectNode();
+			jsonObject.put("statusCode", res.FAILURE);
+			jsonObject.put("message", res.setDescription("Unable to Update Organization"));
+			return new ResponseEntity(jsonObject, HttpStatus.CONFLICT);
+		}
+	}
+	
+	
+	@PutMapping("/superadmin/organization/{organizationId}")
+	public ResponseEntity<Organization> updateOrganizationBySupAdm(@RequestBody AdminOrgReqEntity organizationRequestEntity) {
 		Optional<Organization> Id = organizationService.findById(organizationRequestEntity.getOrganizationId());
 		if (Id.isPresent()) {
 			Organization organizationReq = new Organization(organizationRequestEntity);

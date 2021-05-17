@@ -24,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import com.jesperapps.tracksupervisor.api.extra.AbstractAuditingEntity;
+import com.jesperapps.tracksupervisor.api.message.AdminOrgReqEntity;
+import com.jesperapps.tracksupervisor.api.message.AdminUserReqEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.UserRequestEntity;
 
@@ -33,21 +35,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	
 
-	public ConfirmationToken getOtpToken() {
-		return otpToken;
-	}
-
-	public State getStates() {
-		return states;
-	}
-
-	public void setStates(State states) {
-		this.states = states;
-	}
-
-	public void setOtpToken(ConfirmationToken otpToken) {
-		this.otpToken = otpToken;
-	}
+	
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -68,6 +56,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	
 	@Column(columnDefinition = "bigint(20)")
 	private Long createdByUser;
+	
+	private String otp;
 //	
 //	@OneToOne(mappedBy="user", cascade=CascadeType.ALL)
 //	private ConfirmationToken otpToken;
@@ -151,6 +141,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
 	private List<DoNotTrack> track;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
+	private List<LocationDetails> locationDetails;
+	
 	public User() {
 		super();
 	}
@@ -229,6 +223,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.userType = user.getUserType();
 		this.attachment = user.getAttachment();
 		this.attendance = user.getAttendance();
+		this.verificationStatus=user.getVerificationStatus();
 //		this.userStatus = userStatus;
 	}
 
@@ -373,6 +368,51 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.address=eachUser.getAddress();
 		this.postalCode=eachUser.getPostalCode();
 	}
+	
+	public User(User newUser, User newUser2, AdminOrgReqEntity organizationRequestEntity) {
+		this.name=newUser.getName();
+		this.email=newUser.getEmail();
+		this.phoneNumber=newUser.getPhoneNumber();
+		this.password=newUser.getPassword();
+		this.organization=newUser.getOrganization(); 
+	}
+
+	public User(AdminUserReqEntity user, AdminUserReqEntity userRequestEntity2) {
+		this.userId = user.getUserId();
+		this.name = user.getName();
+		this.passcode = user.getPasscode();
+		this.phoneNumber = user.getPhoneNumber();
+		this.email = user.getEmail();
+		this.states=user.getStates();
+		this.country=user.getCountry();
+		this.city=user.getCity();
+		this.password=user.getPassword();
+		this.postalCode=user.getPostalCode();
+		this.address=user.getAddress();
+		this.createdByUser=user.getCreatedByUser();
+		this.alternatePhoneNumber = user.getAlternatePhoneNumber();
+		this.status = user.getStatus();
+		this.userType = user.getUserType();
+		this.attachment = user.getAttachment();
+//		this.attendance = user.getAttendance();
+//		this.verificationStatus=user.getVerificationStatus();
+	}
+
+	public ConfirmationToken getOtpToken() {
+		return otpToken;
+	}
+
+	public State getStates() {
+		return states;
+	}
+
+	public void setStates(State states) {
+		this.states = states;
+	}
+
+	public void setOtpToken(ConfirmationToken otpToken) {
+		this.otpToken = otpToken;
+	}
 
 	public int getVerificationStatus() {
 		return verificationStatus;
@@ -468,6 +508,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public List<LocationDetails> getLocationDetails() {
+		return locationDetails;
+	}
+
+	public void setLocationDetails(List<LocationDetails> locationDetails) {
+		this.locationDetails = locationDetails;
 	}
 
 	public String getAlternatePhoneNumber() {
@@ -612,6 +660,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
 	}
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+	
+	
 	
 
 //	@Override

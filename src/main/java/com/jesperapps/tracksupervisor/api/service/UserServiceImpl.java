@@ -51,10 +51,9 @@ private EmailService emailService;
 
 	@Override
 	public User save(User users) {
-		System.out.println("usersimpl"+users);
-		User usr =  userRepository.save(users);
-		System.out.println("usr"+usr);
-		 return usr;
+		
+		 return userRepository.save(users);
+		
 	}
 
 	@Override
@@ -269,6 +268,22 @@ private EmailService emailService;
 		}
 
 		return responseList;
+	}
+
+	@Override
+	public boolean checkOtpIsSame(String otp, String otp2) {
+		if(otp.equals(otp2)) {
+			return true;
+		}else {
+			
+		}
+		return false;
+	}
+
+	@Override
+	public User findByEmailAndOtp(String email, String otp) {
+		// TODO Auto-generated method stub
+		return userRepository.findByEmailAndOtp(email,otp);
 	}
 
 	

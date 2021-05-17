@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jesperapps.tracksupervisor.api.extra.AbstractAuditingEntity;
+import com.jesperapps.tracksupervisor.api.message.AdminOrgReqEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizataionWithUserRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 
@@ -102,6 +103,9 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@OneToMany(mappedBy = "organization" , cascade = CascadeType.ALL)
 	private List<User> user;
 	
+	@OneToMany(mappedBy = "organization" , cascade = CascadeType.ALL)
+	private List<LocationDetails> locationDetails;
+	
 	@ManyToOne
 	@JoinColumn
 	private Status status;
@@ -109,6 +113,15 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@ManyToOne
 	@JoinColumn(name = "industryType", referencedColumnName = "industryTypeId")
 	private IndustryType industryType;
+	
+	
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
+//	private List<OrganizationFreeTrial> organizationFreeTrial;
+	
+	@JsonIgnore
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "organization")
+	private OrganizationFreeTrial organizationFreeTrial;
 
 	public Organization() {
 
@@ -214,6 +227,44 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		}
 	}
 
+	public Organization(AdminOrgReqEntity organizationRequestEntity, AdminOrgReqEntity organizationRequestEntity2) {
+		// TODO Auto-generated constructor stubthis.organizationId = organizationRequestEntity.getOrganizationId();
+		this.organizationName = organizationRequestEntity.getOrganizationName();
+//		this.industryType = organizationRequestEntity.getIndustryType();
+//		this.contactPerson = organizationRequestEntity.getContactPerson();
+//		this.contactCountryCode = organizationRequestEntity.getContactCountryCode();
+		this.contactPhoneNumber = organizationRequestEntity.getContactPhoneNumber();
+		this.contactEmail = organizationRequestEntity.getContactEmail();
+//		this.address = organizationRequestEntity.getAddress();
+//		this.postalCode = organizationRequestEntity.getPostalCode();
+//		this.fiscalYearStart = organizationRequestEntity.getFiscalYearStart();
+//		this.defaulTimezone = organizationRequestEntity.getDefaulTimezone();
+//		this.reportingCurrency = organizationRequestEntity.getReportingCurrency();
+//		this.gstNumber=organizationRequestEntity.getGstNumber();
+//		this.country=organizationRequestEntity.getCountry();
+//		this.states=organizationRequestEntity.getStates();
+//		this.city=organizationRequestEntity.getCity();
+	}
+
+	public Organization(AdminOrgReqEntity organizationRequestEntity) {
+		this.organizationId = organizationRequestEntity.getOrganizationId();
+		this.organizationName = organizationRequestEntity.getOrganizationName();
+		this.industryType = organizationRequestEntity.getIndustryType();
+		this.contactPerson = organizationRequestEntity.getContactPerson();
+		this.contactCountryCode = organizationRequestEntity.getContactCountryCode();
+		this.contactPhoneNumber = organizationRequestEntity.getContactPhoneNumber();
+		this.contactEmail = organizationRequestEntity.getContactEmail();
+		this.address = organizationRequestEntity.getAddress();
+		this.postalCode = organizationRequestEntity.getPostalCode();
+		this.fiscalYearStart = organizationRequestEntity.getFiscalYearStart();
+		this.defaulTimezone = organizationRequestEntity.getDefaulTimezone();
+		this.reportingCurrency = organizationRequestEntity.getReportingCurrency();
+		this.gstNumber=organizationRequestEntity.getGstNumber();
+		this.city=organizationRequestEntity.getCity();
+		this.states=organizationRequestEntity.getStates();
+		this.country=organizationRequestEntity.getCountry();
+	}
+
 	public Integer getOrganizationId() {
 		return organizationId;
 	}
@@ -294,12 +345,14 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 		this.country = country;
 	}
 
-	public State getState() {
+	
+
+	public State getStates() {
 		return states;
 	}
 
-	public void setState(State state) {
-		this.states = state;
+	public void setStates(State states) {
+		this.states = states;
 	}
 
 	public City getCity() {
@@ -365,6 +418,26 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	public void setGstNumber(String gstNumber) {
 		this.gstNumber = gstNumber;
 	}
+
+	public List<LocationDetails> getLocationDetails() {
+		return locationDetails;
+	}
+
+	public void setLocationDetails(List<LocationDetails> locationDetails) {
+		this.locationDetails = locationDetails;
+	}
+
+	public OrganizationFreeTrial getOrganizationFreeTrial() {
+		return organizationFreeTrial;
+	}
+
+	public void setOrganizationFreeTrial(OrganizationFreeTrial organizationFreeTrial) {
+		this.organizationFreeTrial = organizationFreeTrial;
+	}
+
+	
+	
+	
 
 //	@Override
 //	public String toString() {
