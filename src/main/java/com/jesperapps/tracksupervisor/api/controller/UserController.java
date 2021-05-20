@@ -1730,7 +1730,25 @@ public class UserController{
 //					return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
 				}else {
 					User user = new User(each);
+					user.setVerificationStatus(1);
+					user.setStatus("Active");
 					User savedUsers = userService.save(user);
+					
+					
+					
+					
+					SecondaryUser secondaryUser=new SecondaryUser(); 
+					//Set<SecondaryUser> secondaryUserList = createdByUser.get().getSecondaryUser();
+//					if(secondaryUserList == null) {
+//						secondaryUserList = new HashSet<>();
+//					}
+//					secondaryUserList.add(secondaryUser);
+					
+					User primaryuser =  new User(savedUsers.getCreatedByUser(),savedUsers.getCreatedByUser());
+					secondaryUser.setPrimaryUser(primaryuser);
+					secondaryUser.setSecondaryUser(savedUsers);
+					
+					secondaryUserService.save(secondaryUser);
 				}
 			}else {
 

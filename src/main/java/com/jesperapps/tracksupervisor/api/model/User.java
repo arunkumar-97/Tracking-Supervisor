@@ -67,6 +67,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		    cascade = CascadeType.ALL)
 	private ConfirmationToken otpToken;
 	
+	@JsonIgnore
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+	private LiveLocation liveLocation;
 
 	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -326,6 +329,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.userId = userDatas.getUserId();
 		this.name = userDatas.getName();
 		this.phoneNumber = userDatas.getPhoneNumber();
+		this.password=userDatas.getPassword();
 		this.email = userDatas.getEmail();
 		this.alternatePhoneNumber = userDatas.getAlternatePhoneNumber();
 		this.userType = userDatas.getUserType();
@@ -337,6 +341,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		}
 		this.createdByUser = userDatas.getCreatedByUser();
 		this.organization = userDatas.getOrganization();
+		this.states=userDatas.getStates();
+		this.country=userDatas.getCountry();
+		this.city=userDatas.getCity();
+//		this.password=userDatas.getPassword();
+		this.postalCode=userDatas.getPostalCode();
 	}
 
 	public User(Optional<User> userDatas, UserRequestEntity eachUser) {
@@ -667,6 +676,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setOtp(String otp) {
 		this.otp = otp;
+	}
+
+	public LiveLocation getLiveLocation() {
+		return liveLocation;
+	}
+
+	public void setLiveLocation(LiveLocation liveLocation) {
+		this.liveLocation = liveLocation;
 	}
 	
 	
