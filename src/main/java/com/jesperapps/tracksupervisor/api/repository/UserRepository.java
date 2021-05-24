@@ -2,6 +2,7 @@ package com.jesperapps.tracksupervisor.api.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -45,6 +46,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	User findByUserId(Long userId);
 
 	User findByEmailAndOtp(String email, String otp);
+
+	List<User> findAllByUserTypeAndOrganization(Set<UserType> userTypes, Object object);
 	
 	
 }

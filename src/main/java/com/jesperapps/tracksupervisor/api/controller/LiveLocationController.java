@@ -78,6 +78,36 @@ public class LiveLocationController {
 		
 	}
 	
+	@GetMapping("/livelocation/{userId}")
+	private ResponseEntity getAllLocationsBasedOnOrganization(@PathVariable Long userId) {
+
+		List<LiveLocationResEntity> response = new ArrayList<>();
+		User userFromDb = userService.findByUserId(userId);
+		if (userFromDb != null) {
+
+			liveLocationService.findByUser(userFromDb).forEach(user-> {
+				
+					response.add(new LiveLocationResEntity(user));
+				
+
+			});
+
+			if (response.isEmpty()) {
+				LiveLocationResEntity liveLocationResEntity = new LiveLocationResEntity();
+				liveLocationResEntity.setStatusCode(201);
+				liveLocationResEntity.setDescription("No Data is Available");
+				return new ResponseEntity(liveLocationResEntity, HttpStatus.NOT_FOUND);
+			}
+
+		} else {
+			LiveLocationResEntity liveLocationResEntity = new LiveLocationResEntity();
+			liveLocationResEntity.setStatusCode(201);
+			liveLocationResEntity.setDescription("No Data  Not Found");
+			return new ResponseEntity(liveLocationResEntity, HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity(response, HttpStatus.ACCEPTED);
+	}
+	
 	
 	
 	

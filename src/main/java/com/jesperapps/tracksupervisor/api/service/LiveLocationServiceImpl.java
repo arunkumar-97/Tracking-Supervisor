@@ -37,6 +37,12 @@ public class LiveLocationServiceImpl implements LiveLocationService {
 		return this.liveLocationRepository.findByUser_UserId(requestedUser.getUserId());
 	}
 
+	@Override
+	public List<LiveLocationResEntity> findByUser(User userFromDb) {
+		// TODO Auto-generated method stub
+		return liveLocationRepository.findByUser(userFromDb);
+	}
+
 	
 
 	

@@ -286,5 +286,11 @@ private EmailService emailService;
 		return userRepository.findByEmailAndOtp(email,otp);
 	}
 
+	@Override
+	public List<User> findAllByUserTypeAndOrganization(Set<UserType> userTypes, Object object) {
+		// TODO Auto-generated method stub
+		return userRepository.findAllByUserTypeAndOrganization(userTypes,object);
+	}
+
 	
 }

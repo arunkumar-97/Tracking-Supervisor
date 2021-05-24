@@ -1931,6 +1931,69 @@ public class UserController{
 		}
 	}
 	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@GetMapping("/primaryuser")
+	public ResponseEntity listPrimaryUser() {
+		Set<UserType> userTypes = new HashSet<UserType>();
+		UserType usertype=new UserType();
+		usertype.setUserTypeId((long) 1);
+		userTypes.add(usertype);
+		List<User> userDatas = userService.findAllByUserTypeAndOrganization(userTypes,null);
+		if (userDatas.isEmpty()) {
+			UserResEntity userResponseEntity = new UserResEntity();
+			userResponseEntity.setErrorCode(204);
+			userResponseEntity.setMessage("No Data is Available");
+			return new ResponseEntity(userResponseEntity, HttpStatus.NOT_FOUND);
+		} else {
+			List<UserResponseEntity> userResponseEntity1 = new ArrayList<UserResponseEntity>();
+			for (User user : userDatas) {
+				
+					UserRequestEntity userRequestEntity = new UserRequestEntity(user, user.getUserId());
+					if (userRequestEntity.getAttachment() == null) {
+
+					} else {
+						Attachment attachment = new Attachment(userRequestEntity.getAttachment(),
+								userRequestEntity.getAttachment());
+						if (attachment.getAttachmentByte() != null) {
+							AttachmentByte attachmentByte = new AttachmentByte(attachment.getAttachmentByte());
+							attachment.setAttachmentByte(attachmentByte);
+						}
+
+						userRequestEntity.setAttachment(attachment);
+					}
+					if (userRequestEntity.getOrganization() != null) {
+						Organization organization = new Organization(userRequestEntity.getOrganization(),
+								userRequestEntity.getOrganization().getOrganizationId());
+						userRequestEntity.setOrganization(organization);
+					}
+
+					Set<UserType> userTypes1 = new HashSet<UserType>();
+					for (UserType userType : userRequestEntity.getUserType()) {
+						if (userType.getStatus() == null || userType.getStatus().equals("Active")
+								|| userType.getStatus().equals("InActive") || userType.getStatus().equals("Pending")
+								|| userType.getStatus().equals("Hold")) {
+							UserType userType1 = new UserType(userType);
+							userTypes1.add(userType1);
+						}
+					}
+
+					userRequestEntity.setUserType(userTypes1);
+					UserResponseEntity userResponseEntity = new UserResponseEntity(userRequestEntity);
+					userResponseEntity1.add(userResponseEntity);
+				
+			}
+			if (userResponseEntity1.isEmpty()) {
+				UserResEntity userResponseEntity = new UserResEntity();
+				userResponseEntity.setErrorCode(204);
+				userResponseEntity.setMessage("No Data is Available");
+				return new ResponseEntity(userResponseEntity, HttpStatus.NOT_FOUND);
+			} else {
+				return new ResponseEntity(userResponseEntity1, HttpStatus.OK);
+			}
+		}
+	}
+	
 	@GetMapping("/user/organization/{organizationId}")
 	public ResponseEntity listUser(@PathVariable("organizationId") Integer organizationId) {
 		Organization org = new Organization(organizationId);

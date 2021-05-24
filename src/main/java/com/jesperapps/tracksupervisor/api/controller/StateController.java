@@ -75,7 +75,7 @@ public class StateController {
 			userResponseEntity.setDescription("No Data  Not Found");
 			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity(response, HttpStatus.ACCEPTED);
+		return new ResponseEntity(response, HttpStatus.OK);
 	}
 
 

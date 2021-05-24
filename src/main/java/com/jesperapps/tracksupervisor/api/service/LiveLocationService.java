@@ -16,6 +16,8 @@ public interface LiveLocationService {
 	
 	LiveLocation findByUserId(User requestedUser);
 
+	List<LiveLocationResEntity> findByUser(User userFromDb);
+
 //	User findByUserId(Long userId);
 
 	

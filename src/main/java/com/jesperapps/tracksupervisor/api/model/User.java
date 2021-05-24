@@ -81,6 +81,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@OneToOne(mappedBy = "user", orphanRemoval = true,
     cascade = CascadeType.ALL)
 	private Attachment attachment;
+	
+	@OneToOne(mappedBy = "user",
+		    cascade = CascadeType.ALL)
+			private DoNotTrackSubscribers doNotTrackSubscribers;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "user")
@@ -684,6 +688,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 	public void setLiveLocation(LiveLocation liveLocation) {
 		this.liveLocation = liveLocation;
+	}
+
+	public DoNotTrackSubscribers getDoNotTrackSubscribers() {
+		return doNotTrackSubscribers;
+	}
+
+	public void setDoNotTrackSubscribers(DoNotTrackSubscribers doNotTrackSubscribers) {
+		this.doNotTrackSubscribers = doNotTrackSubscribers;
 	}
 	
 	

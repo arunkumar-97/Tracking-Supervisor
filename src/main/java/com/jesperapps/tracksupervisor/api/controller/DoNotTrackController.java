@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,8 @@ import com.jesperapps.tracksupervisor.api.message.DoNotTrackRequestingEntity;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrakResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.ApprovalStatus;
 import com.jesperapps.tracksupervisor.api.model.DoNotTrack;
+import com.jesperapps.tracksupervisor.api.model.DoNotTrackSubscribers;
+import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.service.DoNotTrackService;
 import com.jesperapps.tracksupervisor.api.service.UserService;
@@ -47,6 +50,21 @@ public class DoNotTrackController {
 	public Response createDoNotTrackfromRequest(@RequestBody DoNotTrackRequestingEntity reqEntity) { 
 		
 		Response response=new Response();
+		User requestUser = reqEntity.getUser();
+		if(requestUser != null) {
+		User	UserFromDb =this.userService.findByUserId(requestUser.getUserId());
+			if(UserFromDb != null) {
+				Iterator<SecondaryUser> iter = UserFromDb.getPrimaryUser().iterator();
+			SecondaryUser primaryUserAndSecondaryUser = iter.next();
+			User primaryUser =primaryUserAndSecondaryUser != null ? primaryUserAndSecondaryUser.getPrimaryUser() :null;
+			if(primaryUser != null) {
+				DoNotTrackSubscribers sub = primaryUser.getDoNotTrackSubscribers();
+				if(sub != null) {
+					//post notification to sub id
+				}else {
+					//no sub found
+				}
+			}
 		DoNotTrack trackFromDb=doNotTrackService.findByUser_userIdAndFromDateAndToDate(reqEntity.getUser().getUserId(),reqEntity.getFromDate(),reqEntity.getToDate());
 				if(trackFromDb != null) {
 					
@@ -69,6 +87,14 @@ public class DoNotTrackController {
 					return response;
 				}
 //				return response;
+			}else {
+				//user not found on db
+				return null;
+			}
+		}else {
+			//no user foundresponse
+			return null;
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

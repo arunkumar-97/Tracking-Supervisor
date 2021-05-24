@@ -2,6 +2,7 @@ package com.jesperapps.tracksupervisor.api.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.jesperapps.tracksupervisor.api.extra.OtpRequest;
 import com.jesperapps.tracksupervisor.api.extra.OtpResponse;
@@ -66,6 +67,8 @@ public interface UserService {
 	boolean checkOtpIsSame(String otp, String otp2);
 
 	User findByEmailAndOtp(String email, String otp);
+
+	List<User> findAllByUserTypeAndOrganization(Set<UserType> userTypes, Object object);
 
 	
 

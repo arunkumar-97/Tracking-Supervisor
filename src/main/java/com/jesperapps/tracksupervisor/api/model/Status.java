@@ -21,6 +21,10 @@ public class Status {
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
 	private List<WorkPlace> workPlace;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
+	private List<DoNotTrackSubscribers> doNotTrackSubscribers;
+	
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
@@ -44,9 +48,20 @@ public class Status {
 	@OneToMany(mappedBy = "status", cascade = CascadeType.ALL)
 	private List<OrganizationFreeTrial> organizationFreeTrial;
 	
-
 	public Status() {
+		super();
+	}
+	
+	public Status(Integer id) {
 		// TODO Auto-generated constructor stub
+		if(id==1) {
+			this.statusId = (long) 1;
+			this.statusName="Active";
+		}else {
+			this.statusName="InActive";
+			this.statusId=(long) 2;
+		}
+		
 	}
 
 	public Status(Status status2) {
