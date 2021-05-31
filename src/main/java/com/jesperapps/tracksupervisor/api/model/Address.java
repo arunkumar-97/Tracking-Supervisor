@@ -21,9 +21,9 @@ public class Address {
 	private String addressName;
 	private Double latitude;
 	private Double longitude;
-	@ManyToOne
-	@JoinColumn
-	private WorkPlace workPlace;
+//	@ManyToOne
+//	@JoinColumn
+//	private WorkPlace workPlace;
 
 	@OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
 	private List<WorkersCount> workersCount;
@@ -81,13 +81,13 @@ public class Address {
 		this.longitude = longitude;
 	}
 
-	public WorkPlace getWorkPlace() {
-		return workPlace;
-	}
-
-	public void setWorkPlace(WorkPlace workPlace) {
-		this.workPlace = workPlace;
-	}
+//	public WorkPlace getWorkPlace() {
+//		return workPlace;
+//	}
+//
+//	public void setWorkPlace(WorkPlace workPlace) {
+//		this.workPlace = workPlace;
+//	}
 
 	public List<WorkersCount> getWorkersCount() {
 		return workersCount;

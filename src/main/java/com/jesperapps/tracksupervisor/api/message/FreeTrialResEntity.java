@@ -8,8 +8,11 @@ public class FreeTrialResEntity extends BaseResponse{
 	
 	
 	private Integer freeTrialId;
+	public String freeTrialName;
 	private Integer noOfDays;
 	private Status status;
+	private boolean isDefault;
+
 	
 	public FreeTrialResEntity() {
 		
@@ -18,8 +21,10 @@ public class FreeTrialResEntity extends BaseResponse{
 	
 	public FreeTrialResEntity(FreeTrial freeTrial) {
 		this.freeTrialId=freeTrial.getFreeTrialId();
+		this.freeTrialName=freeTrial.getFreeTrialName();
 		this.noOfDays=freeTrial.getNoOfDays();
 		this.status=freeTrial.getStatus();
+		this.isDefault=freeTrial.isDefault();
 	
 	}
 	public Integer getFreeTrialId() {
@@ -39,6 +44,26 @@ public class FreeTrialResEntity extends BaseResponse{
 	}
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+
+	public String getFreeTrialName() {
+		return freeTrialName;
+	}
+
+
+	public void setFreeTrialName(String freeTrialName) {
+		this.freeTrialName = freeTrialName;
+	}
+
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 	
 	

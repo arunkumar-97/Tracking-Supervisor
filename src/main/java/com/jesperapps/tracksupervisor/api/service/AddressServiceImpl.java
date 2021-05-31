@@ -16,11 +16,11 @@ public class AddressServiceImpl implements AddressService{
 	@Autowired
 	private AddressRepository addressRepository;
 
-	@Override
-	public Address findByWorkPlaceAndAddressName(WorkPlace workPlaceData, String address) {
-		// TODO Auto-generated method stub
-		return addressRepository.findByWorkPlaceAndAddressName(workPlaceData, address);
-	}
+//	@Override
+//	public Address findByWorkPlaceAndAddressName(WorkPlace workPlaceData, String address) {
+//		// TODO Auto-generated method stub
+//		return addressRepository.findByWorkPlaceAndAddressName(workPlaceData, address);
+//	}
 
 	@Override
 	public Address deleteAddress(Long addressId) {

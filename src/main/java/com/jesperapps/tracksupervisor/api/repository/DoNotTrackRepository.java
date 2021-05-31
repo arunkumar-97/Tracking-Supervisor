@@ -19,4 +19,7 @@ public interface DoNotTrackRepository extends JpaRepository<DoNotTrack, Integer>
 
 	Iterable<DoNotTrack> findByUserAndApprovalstatus(Optional<User> userFromDb, Optional<ApprovalStatus> approvalStatusFromDb);
 
+	DoNotTrack findByUser_userId(Long userId);
+
+	DoNotTrack findByUser_UserId(Long userId);
 }

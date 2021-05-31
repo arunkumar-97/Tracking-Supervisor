@@ -104,9 +104,9 @@ public class OtpSmsController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(409,"Entered Otp is NOT valid. Please Retry!"));
 
 		}
-		Optional<User> phone = userRegistrationService.findByPhoneNumber(phoneNumber);
-//		System.out.println("phone" + phone);
-		if (phone.isPresent()) {
+		User phone = userRegistrationService.findByPhoneNumber(phoneNumber);
+//		System.out1= null.println("phone" + phone);
+		if (phone != null ) {
 //			phone.get().setOtpVerification("Verified");
 			@SuppressWarnings("unused")
 //		User user = userRegistrationService.save(phone.get());
@@ -114,7 +114,7 @@ public class OtpSmsController {
 //			userRegistrationService.save(user);
 			
 			
-			User user = userRegistrationService.save(phone.get());
+			User user = userRegistrationService.save(phone);
 			user.setVerificationStatus(1);
 			userRegistrationService.save(user);
 //			UserResponseEntity userResponseEntity = new UserResponseEntity(user, user, user);
@@ -141,15 +141,15 @@ public class OtpSmsController {
 //		System.out.println("phoneNumber" + phone);
 		// for(String phone : otpSmsRequestEntity.getPhoneNumber()) {
 		// System.out.println("phones"+phone);
-		Optional<User> phoneNumber = userRegistrationService.findByPhoneNumber(phone);
+		User phoneNumber = userRegistrationService.findByPhoneNumber(phone);
 //		System.out.println("phoneNumbers" + phoneNumber);
-		if (phoneNumber.isPresent()) {
+		if (phoneNumber != null) {
 //			System.out.println("phone present");
 				List<OtpSms> otpSms = otpSmsService.findAll();
 				if (otpSms.isEmpty()) {
 //					System.out.println("otp empty");
 //					otpSmsService.clearOTP(phoneNumber);
-					int otp = otpSmsService.generateOTP(phoneNumber.get().getPhoneNumber());
+					int otp = otpSmsService.generateOTP(phoneNumber.getPhoneNumber());
 					if (otp == 0) {
 //						ObjectNode jsonObject = objectMapper.createObjectNode();
 //						jsonObject.put("statusCode", res.FAILURE);
@@ -185,7 +185,7 @@ public class OtpSmsController {
 				} else {
 					System.out.println("else otp empty");
 					otpSmsService.clearOTP(phone);
-					int otp = otpSmsService.generateOTP(phoneNumber.get().getPhoneNumber());
+					int otp = otpSmsService.generateOTP(phoneNumber.getPhoneNumber());
 					if (otp == 0) {
 //						ObjectNode jsonObject = objectMapper.createObjectNode();
 //						jsonObject.put("statusCode", res.FAILURE);

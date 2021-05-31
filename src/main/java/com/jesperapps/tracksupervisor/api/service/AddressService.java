@@ -5,7 +5,7 @@ import com.jesperapps.tracksupervisor.api.model.WorkPlace;
 
 public interface AddressService {
 
-	Address findByWorkPlaceAndAddressName(WorkPlace workPlaceData, String address);
+//	Address findByWorkPlaceAndAddressName(WorkPlace workPlaceData, String address);
 
 	Address deleteAddress(Long addressId);
 

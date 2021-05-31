@@ -12,7 +12,7 @@ public interface WorkPlaceRepository extends JpaRepository<WorkPlace, Long>{
 
 	List<WorkPlace> findAllByAssignedFromUserAndAssignedToUser(User assignedFromUser, User assignedToUser);
 
-	WorkPlace findByFromDateIsBetweenAndAddress(Date fromDate, Date toDate, String addressName);
+//	WorkPlace findByFromDateIsBetweenAndAddress(Date fromDate, Date toDate, String addressName);
 
 	List<WorkPlace> findAllByAssignedToUser(User assignedToUserId);
 

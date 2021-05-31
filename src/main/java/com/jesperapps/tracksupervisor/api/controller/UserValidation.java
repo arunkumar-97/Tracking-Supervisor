@@ -165,13 +165,20 @@ public class UserValidation {
 						response.setStatusCode(200);
 						response.setDescription("Login Successfull");
 						return  new ResponseEntity(response, HttpStatus.OK);
-					}else {
-						UserResponseEntity response1=new UserResponseEntity();
-						response1.setStatusCode(409);
-						response1.setDescription("Your FreeTrial has been Expired.Please Subscribe to Login");
-						return new ResponseEntity(response1, HttpStatus.CONFLICT); 
 					}
+						
+						
+//						UserResponseEntity response1=new UserResponseEntity();
+//						response1.setStatusCode(409);
+//						response1.setDescription("Your FreeTrial has been Expired.Please Subscribe to Login");
+//						return new ResponseEntity(response1, HttpStatus.CONFLICT); 
 					
+					
+					}else {
+						UserResponseEntity response=new UserResponseEntity(userFromDb,userFromDb);
+						response.setStatusCode(200);
+						response.setDescription("Login Successfull");
+						return  new ResponseEntity(response, HttpStatus.OK);
 					}
 					}
 				}else {

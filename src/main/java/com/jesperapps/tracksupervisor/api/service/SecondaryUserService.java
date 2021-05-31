@@ -10,5 +10,7 @@ public interface SecondaryUserService {
 	SecondaryUser save(SecondaryUser secondaryUser);
 
 	List<SecondaryUser> findAllByPrimaryUser(User user);
+	
+	SecondaryUser findBySecondaryUser(User user);
 
 }

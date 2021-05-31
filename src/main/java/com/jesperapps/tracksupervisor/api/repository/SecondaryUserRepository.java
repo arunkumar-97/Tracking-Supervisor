@@ -10,5 +10,7 @@ import com.jesperapps.tracksupervisor.api.model.User;
 public interface SecondaryUserRepository extends JpaRepository<SecondaryUser, Integer>{
 
 	List<SecondaryUser> findAllByPrimaryUser(User user);
+	
+	SecondaryUser findBySecondaryUser_UserId(Long userIds);
 
 }

@@ -46,6 +46,16 @@ public class DoNotTrack extends AbstractAuditingEntity implements Serializable{
 	}
 	
 	
+	public DoNotTrack(DoNotTrack secondaryUserWithDoNotTrack, DoNotTrack secondaryUserWithDoNotTrack2, DoNotTrack secondaryUserWithDoNotTrack3) {
+		this.trackId=secondaryUserWithDoNotTrack.getTrackId();
+		this.fromDate=secondaryUserWithDoNotTrack.getFromDate();
+		this.toDate=secondaryUserWithDoNotTrack.getToDate();
+		this.status=secondaryUserWithDoNotTrack.getStatus();
+		this.approvalstatus=secondaryUserWithDoNotTrack.getApprovalstatus();
+		this.user=secondaryUserWithDoNotTrack.getUser();
+	}
+	
+	
 	public DoNotTrack(DoNotTrackRequestingEntity reqEntity) {
 		// TODO Auto-generated constructor stub
 		this.trackId=reqEntity.getTrackId();

@@ -3,13 +3,51 @@ package com.jesperapps.tracksupervisor.api;
 import org.springframework.boot.SpringApplication;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.xbill.DNS.*;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 
 @SpringBootApplication
 public class TrackSupervisorApplication {
+	
+	@Bean
+	FirebaseApp firebaseApp()  throws IOException{
+//		InputStream serviceAccount =this.getClass().getClassLoader().getResourceAsStream
+//				  ("./tracking-application-288112-firebase-adminsdk-ioqnq-9d9b829620.json");
+
+				FirebaseOptions options = new FirebaseOptions.Builder()
+						  .setCredentials(GoogleCredentials.fromStream(new ClassPathResource("printlokapps-firebase-adminsdk-8z93f-f6e8b3671c.json").getInputStream()))
+						  .setDatabaseUrl("https://printlokapps-default-rtdb.firebaseio.com/")
+//				  .setCredentials(GoogleCredentials.fromStream(new ClassPathResource("tracking-application-288112-firebase-adminsdk-ioqnq-9d9b829620.json").getInputStream()))
+//				  .setDatabaseUrl("https://tracking-application-288112-default-rtdb.firebaseio.com")
+				  .build();
+					
+		
+//		FileInputStream serviceAccount =
+//				  new FileInputStream("path/to/serviceAccountKey.json");
+//
+//				FirebaseOptions options = new FirebaseOptions.Builder()
+//				  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+//				  .build();
+				
+				if(FirebaseApp.getApps().isEmpty()) {
+					return  FirebaseApp.initializeApp(options);
+				}else {
+					return FirebaseApp.getInstance();
+				}
+			
+				
+			
+	}
 
 	public static void main(String[] args) throws TextParseException, UnknownHostException {
 //		Scanner input = new Scanner(System.in);

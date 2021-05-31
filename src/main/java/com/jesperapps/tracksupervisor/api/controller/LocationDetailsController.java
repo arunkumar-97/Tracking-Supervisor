@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +21,7 @@ import com.jesperapps.tracksupervisor.api.extra.Response;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrackRequestingEntity;
 import com.jesperapps.tracksupervisor.api.message.LocationDetailsRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.LocationDetailsResponseEntity;
+import com.jesperapps.tracksupervisor.api.message.OrganizationRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.OrganizationResponseEntity;
 import com.jesperapps.tracksupervisor.api.message.StateResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
@@ -50,6 +52,8 @@ public class LocationDetailsController {
 	
 	@Autowired
 	private UserService userService;
+	
+	LocationDetailsResponseEntity res=new LocationDetailsResponseEntity();
 	
 	@PostMapping("/locationDetails")
 	public ResponseEntity createDoNotTrackfromRequest(@RequestBody LocationDetailsRequestEntity reqEntity) { 
@@ -98,6 +102,25 @@ public class LocationDetailsController {
 				}
 //				return response;
 	}
+	
+	@PutMapping("/locationDetails/{locationId}")
+	public ResponseEntity updateOrganization(@RequestBody LocationDetailsRequestEntity organizationRequestEntity) {
+		Optional<LocationDetails> Id = locationDetailsService.findById(organizationRequestEntity.getLocationId());
+		if (Id.isPresent()) {
+			LocationDetails locationDetailsReq = new LocationDetails(organizationRequestEntity,Id);
+			LocationDetails organization = locationDetailsService.save(locationDetailsReq);
+			ObjectNode jsonObject = objectMapper.createObjectNode();
+			jsonObject.put("statusCode", res.SUCCESS);
+			jsonObject.put("description", res.setDescription("Location Updated Successfully"));
+			return new ResponseEntity(jsonObject, HttpStatus.OK);
+		} else {
+			ObjectNode jsonObject = objectMapper.createObjectNode();
+			jsonObject.put("statusCode", res.FAILURE);
+			jsonObject.put("message", res.setDescription("Unable to Update Location"));
+			return new ResponseEntity(jsonObject, HttpStatus.CONFLICT);
+		}
+	}
+	
 	
 	@GetMapping("/locationDetails")
 	private ResponseEntity getAllState() {
@@ -211,11 +234,11 @@ public class LocationDetailsController {
 		User requestUser = userService.findByUserId(userId);
 		if(requestUser != null) {
 			requestUser.getLocationDetails().forEach(location -> {
-
-					List.add(new LocationDetailsResponseEntity(location
-	
-							
-							));
+				LocationDetailsResponseEntity locationDetailsResponseEntity=	new LocationDetailsResponseEntity(location);
+				
+				User u=new User(locationDetailsResponseEntity.getUser(),locationDetailsResponseEntity.getUser());
+				locationDetailsResponseEntity.setUser(u);
+				List.add(locationDetailsResponseEntity);
 				
 			
 			});

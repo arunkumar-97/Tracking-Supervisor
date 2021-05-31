@@ -103,6 +103,7 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 	@OneToMany(mappedBy = "organization" , cascade = CascadeType.ALL)
 	private List<User> user;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "organization" , cascade = CascadeType.ALL)
 	private List<LocationDetails> locationDetails;
 	

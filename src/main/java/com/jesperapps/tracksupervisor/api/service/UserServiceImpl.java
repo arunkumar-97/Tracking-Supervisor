@@ -131,7 +131,7 @@ private EmailService emailService;
 	}
 
 	@Override
-	public Optional<User> findByPhoneNumber(String phoneNumber) {
+	public User findByPhoneNumber(String phoneNumber) {
 		// TODO Auto-generated method stub
 		return userRepository.findByPhoneNumber(phoneNumber);
 	}

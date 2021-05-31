@@ -18,6 +18,7 @@ import com.jesperapps.tracksupervisor.api.message.AttendanceRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.AttendanceResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Address;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
+import com.jesperapps.tracksupervisor.api.model.LocationDetails;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.WorkPlace;
 import com.jesperapps.tracksupervisor.api.service.AttendanceService;
@@ -94,7 +95,8 @@ public class AttendanceController {
 				if(attendanceReqEntity.getDate().after(wp.getFromDate()) 
 						|| attendanceReqEntity.getDate().before(wp.getToDate())){
 					System.out.println("iff");
-					for (Address add : wp.getAddress()) {
+//					for (Address add : wp.getAddress()) {
+					LocationDetails locdetails=wp.getLocationDetails();
 						int distance = 2;
 //						Scanner input = new Scanner(System.in);
 //				        System.out.print("Input the latitude of coordinate 1: ");
@@ -108,8 +110,8 @@ public class AttendanceController {
 
 						double lat1 = Math.toRadians(attendanceReqEntity.getLatitude());
 						double lon1 = Math.toRadians(attendanceReqEntity.getLongitude());
-						double lat2 = Math.toRadians(add.getLatitude());
-						double lon2 = Math.toRadians(add.getLongitude());
+						double lat2 = Math.toRadians(locdetails.getLatitude());
+						double lon2 = Math.toRadians(locdetails.getLongitude());
 
 				        double earthRadius = 6371.01; //Kilometers
 				        double dist = earthRadius * Math.acos(Math.sin(lat1)*Math.sin(lat2) + Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1 - lon2));
@@ -138,7 +140,7 @@ public class AttendanceController {
 //							userDataResEntity.setMessage("Distance exceeded 2km");
 //							return new ResponseEntity(userDataResEntity, HttpStatus.CONFLICT);
 						}
-					}
+//					}
 				} else {
 					
 				}

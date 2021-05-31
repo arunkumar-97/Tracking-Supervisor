@@ -1,4 +1,4 @@
-package com.jesperapps.tracksupervisor.api.controller;
+	package com.jesperapps.tracksupervisor.api.controller;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -99,8 +99,8 @@ public class OrganizationController {
 	OrganizationResponseEntity res = new OrganizationResponseEntity();
 	
 	
-//	private final String FROM_ADDRESS = "arun.thril@gmail.com";
-	private final String FROM_ADDRESS = "arun.kumar@jespersoft.com";
+	private final String FROM_ADDRESS = "arun.thril@gmail.com";
+//	private final String FROM_ADDRESS = "arun.kumar@jespersoft.com";
 	
 	@PostMapping("/check/organization")
 	public ResponseEntity createCheckOrganization(@RequestBody OrganizationRequestEntity organizationRequestEntity) {
@@ -321,9 +321,9 @@ public class OrganizationController {
 				User emailFromDb=		userService.findUserByEmail(newUser.getEmail());
 				if(emailFromDb == null) {
 					
-					Optional<User> numberFromDb=userService.findByPhoneNumber(newUser.getPhoneNumber());
+					User numberFromDb=userService.findByPhoneNumber(newUser.getPhoneNumber());
 					
-					if(numberFromDb.isEmpty()){
+					if(numberFromDb == null){
 						
 					}else{
 						UserResponseEntity userResEntity = new UserResponseEntity();
@@ -369,16 +369,16 @@ public class OrganizationController {
 						
 						props.put("mail.smtp.auth", "true");
 						props.put("mail.smtp.starttls.enable", "true");
-						props.put("mail.smtp.host", "mail.jespersoft.com");
-//						props.put("mail.smtp.host", "smtp.gmail.com");
-//						props.put("mail.smtp.port", "587");
-						props.put("mail.smtp.port", "25");
+//						props.put("mail.smtp.host", "mail.jespersoft.com");
+						props.put("mail.smtp.host", "smtp.gmail.com");
+						props.put("mail.smtp.port", "587");
+//						props.put("mail.smtp.port", "25");
 
 
 						Authenticator auth = new Authenticator() {
 							protected PasswordAuthentication getPasswordAuthentication() {
-								return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
-//								return new PasswordAuthentication(FROM_ADDRESS,"arunvenkat");
+//								return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
+								return new PasswordAuthentication(FROM_ADDRESS,"Arun12345$");
 							}
 						};
 						Session session = Session.getInstance(props, auth);
@@ -429,22 +429,25 @@ public class OrganizationController {
 					orgFreeTrial.setFreeTrial(organizationRequestEntity.getFreeTrial());
 					Date date=new Date();
 					orgFreeTrial.setStartDate(date);
-					Optional<FreeTrial> freetrial=freeTrialService.findById(organizationRequestEntity.getFreeTrial().getFreeTrialId());
+					if(organizationRequestEntity.getFreeTrial() != null) {
+						Optional<FreeTrial> freetrial=freeTrialService.findById(organizationRequestEntity.getFreeTrial().getFreeTrialId());
+						Integer noofdays = freetrial.get().getNoOfDays();
+						Date endate = new Date();
+						    endate.setDate(endate.getDate() + noofdays);
+						    orgFreeTrial.setEndDate(endate);
+						    
+						    
+						    
+						    System.out.println("StartDate :" + date);
+						    System.out.println("StartDate :" + endate);
+						    Status status=new Status();
+						    status.setStatusId((long) 1);
+						    orgFreeTrial.setStatus(status);  
+						    organizationFreeTrialService.save(orgFreeTrial);
+					}
 //					System.out.println("FreeTrial :" + freetrial);
 					
-					Integer noofdays = freetrial.get().getNoOfDays();
-					Date endate = new Date();
-					    endate.setDate(endate.getDate() + noofdays);
-					    orgFreeTrial.setEndDate(endate);
-					    
-					    
-					    
-					    System.out.println("StartDate :" + date);
-					    System.out.println("StartDate :" + endate);
-					    Status status=new Status();
-					    status.setStatusId((long) 1);
-					    orgFreeTrial.setStatus(status);  
-					    organizationFreeTrialService.save(orgFreeTrial);
+					
 					    
 					}
 		                     
@@ -687,6 +690,21 @@ public class OrganizationController {
 					    	Status status = new Status(Organization.getStatus());
 					    	Organization.setStatus(status); 
 					    }
+					    
+					    List<User> responseuser=new ArrayList<>();
+					 
+					     for(User user : Organization.getUser())
+
+					    	 {
+					    	 
+					    	 User user1=new User(user,user);
+					    	 responseuser.add(user1);
+					    	 
+					    	 }
+					     
+					     Organization.setUser(responseuser);
+					     
+					     
 					  response.add(new OrganizationResponseEntity(Organization));
 				  }
 					

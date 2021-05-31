@@ -43,12 +43,20 @@ public class FreeTrialController {
 		Response response=new Response();
 		FreeTrial freeTrialFromDb=freeTrialService.findByNoOfDays(reqEntity.getNoOfDays());
 				if(freeTrialFromDb == null) {
-					
-					FreeTrial freeTrial=new FreeTrial(reqEntity);
-					freeTrialService.save(freeTrial);
-						response.setStatusCode(200);
-						response.setDescription("FreeTrial Created Successfully for the required No.Of.Days");
-						return new ResponseEntity(response, HttpStatus.ACCEPTED);
+						if(reqEntity.isDefault() == true) {
+							List<FreeTrial> freeTrialAll=freeTrialService.findAll();
+							for(FreeTrial eachFreeTrial:freeTrialAll) {
+								eachFreeTrial.setDefault(false);
+								freeTrialService.save(eachFreeTrial);
+								
+							}
+							
+						}
+						FreeTrial freeTrial=new FreeTrial(reqEntity);
+						freeTrialService.save(freeTrial);
+							response.setStatusCode(200);
+							response.setDescription("FreeTrial Created Successfully for the required No.Of.Days");
+							return new ResponseEntity(response, HttpStatus.ACCEPTED);
 					
 					
 				}else {
@@ -59,6 +67,7 @@ public class FreeTrialController {
 					return new ResponseEntity(response, HttpStatus.CONFLICT);
 				}
 //				return response;
+				
 	}
 	
 	@GetMapping("/freetrial")

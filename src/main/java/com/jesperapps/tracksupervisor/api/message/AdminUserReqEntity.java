@@ -7,6 +7,7 @@ import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.Organization;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
@@ -36,6 +37,7 @@ public class AdminUserReqEntity {
 	private Set<Attendance> userData;
 	private List<TimeTracking> timeTracking;
 	private Organization organization;
+	private FreeTrial freeTrial;
 	public Long getUserId() {
 		return userId;
 	}
@@ -161,6 +163,12 @@ public class AdminUserReqEntity {
 	}
 	public void setOrganization(Organization organization) {
 		this.organization = organization;
+	}
+	public FreeTrial getFreeTrial() {
+		return freeTrial;
+	}
+	public void setFreeTrial(FreeTrial freeTrial) {
+		this.freeTrial = freeTrial;
 	}
 	
 	

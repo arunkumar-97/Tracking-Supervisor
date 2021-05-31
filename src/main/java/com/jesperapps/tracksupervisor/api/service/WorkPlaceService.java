@@ -13,7 +13,7 @@ public interface WorkPlaceService {
 
 	List<WorkPlace> findAllByAssignedFromUserAndAssignedToUser(User assignedFromUser, User assignedToUser);
 
-	WorkPlace findByFromDateAndToDateIsBetweenAndAddress(Date fromDate, Date toDate, String addressName);
+//	WorkPlace findByFromDateAndToDateIsBetweenAndAddress(Date fromDate, Date toDate, String addressName);
 
 	List<WorkPlace> findAllByAssignedToUser(User assignedToUserId);
 

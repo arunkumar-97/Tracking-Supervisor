@@ -100,8 +100,8 @@ public class OrganizationServiceImpl implements OrganizationService{
 			}
 			User userWithSameEmailId = userService.findUserByEmail(orgRequest.getUser().getEmail());
 			if(userWithSameEmailId== null) {
-				Optional<User>	userWithPhNum=userService.findByPhoneNumber(orgRequest.getUser().getPhoneNumber());
-				if(userWithPhNum.isPresent()) {
+				User	userWithPhNum=userService.findByPhoneNumber(orgRequest.getUser().getPhoneNumber());
+				if(userWithPhNum != null) {
 					ObjectNode jsonObject = objectMapper.createObjectNode();
 					jsonObject.put("statusCode", res.SUCCESS);
 					jsonObject.put("description", res.setDescription("User with PhoneNumber Already Exists"));

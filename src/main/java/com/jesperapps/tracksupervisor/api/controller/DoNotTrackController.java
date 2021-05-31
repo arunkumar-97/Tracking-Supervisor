@@ -1,9 +1,11 @@
 package com.jesperapps.tracksupervisor.api.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.TextMessage;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.jesperapps.tracksupervisor.api.extra.Response;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrackRequestingEntity;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrakResponseEntity;
@@ -27,6 +32,8 @@ import com.jesperapps.tracksupervisor.api.model.DoNotTrackSubscribers;
 import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.service.DoNotTrackService;
+import com.jesperapps.tracksupervisor.api.service.FireBaseInitializerService;
+import com.jesperapps.tracksupervisor.api.service.SecondaryUserService;
 import com.jesperapps.tracksupervisor.api.service.UserService;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -44,6 +51,13 @@ public class DoNotTrackController {
 	@Autowired
 	private ApprovalStatusController approvalStatusService;
 	
+	@Autowired
+	private FireBaseInitializerService firebaseService;
+	
+	
+	@Autowired
+	private SecondaryUserService secondaryUserService;
+	
 	
 	
 	@PostMapping("/track")
@@ -54,15 +68,39 @@ public class DoNotTrackController {
 		if(requestUser != null) {
 		User	UserFromDb =this.userService.findByUserId(requestUser.getUserId());
 			if(UserFromDb != null) {
-				Iterator<SecondaryUser> iter = UserFromDb.getPrimaryUser().iterator();
-			SecondaryUser primaryUserAndSecondaryUser = iter.next();
-			User primaryUser =primaryUserAndSecondaryUser != null ? primaryUserAndSecondaryUser.getPrimaryUser() :null;
+				SecondaryUser secondaryUserFromDb = this.secondaryUserService.findBySecondaryUser(UserFromDb);
+			User primaryUser =secondaryUserFromDb != null ? secondaryUserFromDb.getPrimaryUser() :null;
 			if(primaryUser != null) {
 				DoNotTrackSubscribers sub = primaryUser.getDoNotTrackSubscribers();
 				if(sub != null) {
 					//post notification to sub id
+					try {
+						this.firebaseService.getMessaging()
+						.send(
+								Message.builder()
+								.setToken(sub.getSubscriptionId())
+								.setNotification(
+										Notification.builder()
+										.setTitle(UserFromDb.getName()+"has request to don't track")
+//										.setBody(UserFromDb.getUserId() + "-Employee Id has enabled DoNotTrack feature")
+										.setBody(reqEntity.getFromDate()+" to "+ reqEntity.getToDate()+" has enabled DoNotTrack feature")
+										.build()
+									)
+								.build()
+							);
+					} catch (FirebaseMessagingException e) {
+						// TODO Auto-generated catch block
+						//error sending firebase push notification
+						//e.printStackTrace();
+						response.setStatusCode(409);
+						response.setDescription(e.getMessage());
+						return response;
+					}
 				}else {
 					//no sub found
+					response.setDescription("No subscription found");
+					response.setStatusCode(409);
+					return response;
 				}
 			}
 		DoNotTrack trackFromDb=doNotTrackService.findByUser_userIdAndFromDateAndToDate(reqEntity.getUser().getUserId(),reqEntity.getFromDate(),reqEntity.getToDate());
@@ -112,7 +150,7 @@ public class DoNotTrackController {
 			DoNotTrack dontrackdata=doNotTrackService.save1(newTrack);
 			if (dontrackdata != null) {
 				DoNotTrackRequestingEntity userReqEntity = new DoNotTrackRequestingEntity(dontrackdata);
-				DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity(userReqEntity);
+				DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity();
 //				UserType uTypes = userRequestEntity.getUserType();
 //				for (UserType ut : userResponseEntity.getData().getUserType()) {
 //					UserType userType = new UserType(ut, ut);
@@ -230,6 +268,72 @@ public class DoNotTrackController {
 			userResponseEntity.setDescription("No Data  Not Found");
 			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 		}
+
+		return new ResponseEntity(response, HttpStatus.ACCEPTED);
+
+	}
+	
+	
+	
+	@GetMapping("/track/byprimaryuser/{userId}")
+	public ResponseEntity getDoNotTrackByByPrimaryUser(@PathVariable Long userId) {
+//		List<DoNotTrakResponseEntity> response = new ArrayList<>();
+		User primaryUserFromDb = userService.findByUserId(userId);
+		List<DoNotTrakResponseEntity> response = new ArrayList<>();
+//		List<User> secondaryUserWithDoNotTrackList =new ArrayList<User>();
+	   	List<SecondaryUser> listOfSecondaryUserFromDb = this.secondaryUserService.findAllByPrimaryUser(primaryUserFromDb);
+		for(SecondaryUser u : listOfSecondaryUserFromDb) {
+			User secondaryUser = u.getSecondaryUser();
+			if(secondaryUser != null) {
+				DoNotTrack secondaryUserWithDoNotTrack = this.doNotTrackService.findByUser_UserId(secondaryUser.getUserId());
+				 
+				if(secondaryUserWithDoNotTrack != null) {
+					DoNotTrack userr=new DoNotTrack(secondaryUserWithDoNotTrack,secondaryUserWithDoNotTrack,secondaryUserWithDoNotTrack);
+					
+					   User usern = new User(userr.getUser() , userr.getUser());
+					   userr.setUser(usern);
+					      
+					response.add(new DoNotTrakResponseEntity( userr));
+//					return new ResponseEntity(secondaryUserWithDoNotTrackList, HttpStatus.OK);
+				
+				}
+				
+				if (response.isEmpty()) {
+					DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity();
+					userResponseEntity.setStatusCode(201);
+					userResponseEntity.setDescription("No Data is Available");
+					return new ResponseEntity(userResponseEntity, HttpStatus.NOT_FOUND);
+				}
+			}else {
+				DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity();
+				userResponseEntity.setStatusCode(201);
+				userResponseEntity.setDescription("No Data  Not Found");
+				return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+			}
+		}
+//		if (primaryUserFromDb != null) 
+		
+//			User user=new User(users,users.getUserId());
+//			doNotTrackService.findByUser(userFromDb).forEach(clas -> {
+////				if (!clas.getSubscriptionStatus().getStatus().equalsIgnoreCase(SubscriptionStatusTag.SUBSCRIBED)) {
+//					response.add(new DoNotTrakResponseEntity(clas));
+////				} else {
+////					return;
+////				}
+//			});
+//
+//			if (response.isEmpty()) {
+//				DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity();
+//				userResponseEntity.setStatusCode(201);
+//				userResponseEntity.setDescription("No Data is Available");
+//				return new ResponseEntity(userResponseEntity, HttpStatus.NOT_FOUND);
+//			}
+//		} else {
+//			DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity();
+//			userResponseEntity.setStatusCode(201);
+//			userResponseEntity.setDescription("No Data  Not Found");
+//			return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
+//		}
 
 		return new ResponseEntity(response, HttpStatus.ACCEPTED);
 

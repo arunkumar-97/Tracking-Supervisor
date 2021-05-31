@@ -26,6 +26,7 @@ import com.jesperapps.tracksupervisor.api.message.WorkPlaceResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Address;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
+import com.jesperapps.tracksupervisor.api.model.LocationDetails;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.WorkPlace;
@@ -63,35 +64,35 @@ public class WorkPlaceController {
 			workPlaceResponseEntity.setMessage("ToDate can't be empty");
 			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
 		}
-		if (workPlaceReqEntity.getAddress() == null || workPlaceReqEntity.getAddress().isEmpty()) {
-			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-			workPlaceResponseEntity.setErrorCode(400);
-			workPlaceResponseEntity.setMessage("Address can't be empty");
-			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-		} else {
-			for (Address address : workPlaceReqEntity.getAddress()) {
-				if (address.getLatitude().equals(0.0)) {
-					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-					workPlaceResponseEntity.setErrorCode(400);
-					workPlaceResponseEntity.setMessage("Latitude can't be empty");
-					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-				}
-				if (address.getLongitude().equals(0.0)) {
-					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-					workPlaceResponseEntity.setErrorCode(400);
-					workPlaceResponseEntity.setMessage("Longitude can't be empty");
-					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-				}
-
-				if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
-					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-					workPlaceResponseEntity.setErrorCode(400);
-					workPlaceResponseEntity.setMessage("Address can't be empty");
-					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-				}
-			}
-
-		}
+//		if (workPlaceReqEntity.getAddress() == null || workPlaceReqEntity.getAddress().isEmpty()) {
+//			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//			workPlaceResponseEntity.setErrorCode(400);
+//			workPlaceResponseEntity.setMessage("Address can't be empty");
+//			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//		} else {
+//			for (Address address : workPlaceReqEntity.getAddress()) {
+//				if (address.getLatitude().equals(0.0)) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Latitude can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//				if (address.getLongitude().equals(0.0)) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Longitude can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//
+//				if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Address can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//			}
+//
+//		}
 	WorkPlace	workPlaceFromDb=workPlaceService.findByAssignedToUserAndFromDateAndToDate(workPlaceReqEntity.getAssignedToUser(),workPlaceReqEntity.getFromDate(),workPlaceReqEntity.getToDate());
 		if(workPlaceFromDb==null) {
 			WorkPlace workPlace = new WorkPlace(workPlaceReqEntity);
@@ -136,35 +137,35 @@ public class WorkPlaceController {
 				workPlaceResponseEntity.setMessage("ToDate can't be empty");
 				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
 			}
-			if (each.getAddress() == null || each.getAddress().isEmpty()) {
-				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-				workPlaceResponseEntity.setErrorCode(400);
-				workPlaceResponseEntity.setMessage("Address can't be empty");
-				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-			} else {
-				for (Address address : each.getAddress()) {
-					if (address.getLatitude().equals(0.0)) {
-						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-						workPlaceResponseEntity.setErrorCode(400);
-						workPlaceResponseEntity.setMessage("Latitude can't be empty");
-						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-					}
-					if (address.getLongitude().equals(0.0)) {
-						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-						workPlaceResponseEntity.setErrorCode(400);
-						workPlaceResponseEntity.setMessage("Longitude can't be empty");
-						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-					}
-
-					if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
-						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-						workPlaceResponseEntity.setErrorCode(400);
-						workPlaceResponseEntity.setMessage("Address can't be empty");
-						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-					}
-				}
-
-			}
+//			if (each.getAddress() == null || each.getAddress().isEmpty()) {
+//				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//				workPlaceResponseEntity.setErrorCode(400);
+//				workPlaceResponseEntity.setMessage("Address can't be empty");
+//				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//			} else {
+//				for (Address address : each.getAddress()) {
+//					if (address.getLatitude().equals(0.0)) {
+//						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//						workPlaceResponseEntity.setErrorCode(400);
+//						workPlaceResponseEntity.setMessage("Latitude can't be empty");
+//						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//					}
+//					if (address.getLongitude().equals(0.0)) {
+//						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//						workPlaceResponseEntity.setErrorCode(400);
+//						workPlaceResponseEntity.setMessage("Longitude can't be empty");
+//						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//					}
+//
+//					if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
+//						WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//						workPlaceResponseEntity.setErrorCode(400);
+//						workPlaceResponseEntity.setMessage("Address can't be empty");
+//						return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//					}
+//				}
+//
+//			}
 			
 			List<WorkPlace>	workPlaceFromDb=workPlaceService.findAllByAssignedToUserAndFromDateAndToDate(each.getAssignedToUser(),each.getFromDate(),each.getToDate());
 			if(workPlaceFromDb.isEmpty()) {
@@ -207,50 +208,50 @@ public class WorkPlaceController {
 	}
 
 
-	@PutMapping("/work-place/{supervisorUserId}/{noOfWorkers}/{date}/{address}/{noOfWorkersUpdatedByUserId}")
-	public ResponseEntity updateWorkPlace(@PathVariable("supervisorUserId") Long supervisorUserId,
-			@PathVariable("noOfWorkers") int noOfWorkers, @PathVariable("date") Date date,
-			@PathVariable("address") String address,
-			@PathVariable("noOfWorkersUpdatedByUserId") Long noOfWorkersUpdatedByUserId) {
-
-		User assignedToUserId = new User(supervisorUserId, supervisorUserId);
-		List<WorkPlace> workPlace = workPlaceService.findAllByAssignedToUser(assignedToUserId);
-		for (WorkPlace wp : workPlace) {
-			if ((wp.getFromDate().compareTo(date) * date.compareTo(wp.getToDate()) >= 0)
-					|| (wp.getFromDate().compareTo(date) * date.compareTo(wp.getToDate()) >= 0)) {
-				Address add = addressService.findByWorkPlaceAndAddressName(wp, address);
-				System.out.println("add" + add);
-				User noOfWorkersUpdatedBy = new User(noOfWorkersUpdatedByUserId, noOfWorkersUpdatedByUserId);
-				WorkersCount workersCount = new WorkersCount(noOfWorkers, date, add, noOfWorkersUpdatedBy);
-				WorkersCount wcData = workersCountService.findByNoOfWorkersAndDateAndAddressAndNoOfWorkersUpdatedByUser(
-						noOfWorkers, date, add, noOfWorkersUpdatedBy);
-				if (wcData == null) {
-					WorkersCount wc = workersCountService.save(workersCount);
-					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-					workPlaceResponseEntity.setStatusCode(200);
-					workPlaceResponseEntity.setErrorCode(null);
-					workPlaceResponseEntity.setDescription("No of Workers Updated Successfully");
-					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.OK);
-				} else {
-					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-					workPlaceResponseEntity.setErrorCode(409);
-					workPlaceResponseEntity.setMessage("No of Workers already updated");
-					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-				}
-
-			}
-//			WorkPlace workPlaceData = workPlaceService.findByFromDateIsBetween(date,date);
-//			System.out.println("workPlaceData"+workPlaceData);
-//			if(workPlace != null){
-//				
-//			}else {
-//				
+//	@PutMapping("/work-place/{supervisorUserId}/{noOfWorkers}/{date}/{address}/{noOfWorkersUpdatedByUserId}")
+//	public ResponseEntity updateWorkPlace(@PathVariable("supervisorUserId") Long supervisorUserId,
+//			@PathVariable("noOfWorkers") int noOfWorkers, @PathVariable("date") Date date,
+//			@PathVariable("address") String address,
+//			@PathVariable("noOfWorkersUpdatedByUserId") Long noOfWorkersUpdatedByUserId) {
+//
+//		User assignedToUserId = new User(supervisorUserId, supervisorUserId);
+//		List<WorkPlace> workPlace = workPlaceService.findAllByAssignedToUser(assignedToUserId);
+//		for (WorkPlace wp : workPlace) {
+//			if ((wp.getFromDate().compareTo(date) * date.compareTo(wp.getToDate()) >= 0)
+//					|| (wp.getFromDate().compareTo(date) * date.compareTo(wp.getToDate()) >= 0)) {
+//				Address add = addressService.findByWorkPlaceAndAddressName(wp, address);
+//				System.out.println("add" + add);
+//				User noOfWorkersUpdatedBy = new User(noOfWorkersUpdatedByUserId, noOfWorkersUpdatedByUserId);
+//				WorkersCount workersCount = new WorkersCount(noOfWorkers, date, add, noOfWorkersUpdatedBy);
+//				WorkersCount wcData = workersCountService.findByNoOfWorkersAndDateAndAddressAndNoOfWorkersUpdatedByUser(
+//						noOfWorkers, date, add, noOfWorkersUpdatedBy);
+//				if (wcData == null) {
+//					WorkersCount wc = workersCountService.save(workersCount);
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setStatusCode(200);
+//					workPlaceResponseEntity.setErrorCode(null);
+//					workPlaceResponseEntity.setDescription("No of Workers Updated Successfully");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.OK);
+//				} else {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(409);
+//					workPlaceResponseEntity.setMessage("No of Workers already updated");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//
 //			}
-		}
-
-		return null;
-
-	}
+////			WorkPlace workPlaceData = workPlaceService.findByFromDateIsBetween(date,date);
+////			System.out.println("workPlaceData"+workPlaceData);
+////			if(workPlace != null){
+////				
+////			}else {
+////				
+////			}
+//		}
+//
+//		return null;
+//
+//	}
 
 	@GetMapping("/work-place/{managerUserId}/{supervisorUserId}")
 	public ResponseEntity ListWorkPlaceByManagerUserIdAndSupervisorUserId(
@@ -351,22 +352,23 @@ public class WorkPlaceController {
 				if (wp.getFromDate().compareTo(date)
 						* date.compareTo(wp.getToDate()) >= 0) {
 					System.out.println("if");
-					for (Address add : wp.getAddress()) {
-						if(add.getAddressName().equals(address)) {
-							Address addressDeleted = addressService.deleteAddress(add.getAddressId());
-							if (addressDeleted == null) {
-								WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
-								workPlaceResponseEntity.setErrorCode(400);
-								workPlaceResponseEntity.setMessage("Unable to delete WorkPlace for the given Address");
-								return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
-							} else {
-								WorkPlaceResponseEntity workPlaceResEntity = new WorkPlaceResponseEntity();
-								workPlaceResEntity.setStatusCode(200);
-								workPlaceResEntity.setDescription("WorkPlace Deleted Successfully for the given Address");
-								return new ResponseEntity(workPlaceResEntity, HttpStatus.OK);
-							}
+//					for (Address add : wp.getAddress()) {
+				LocationDetails details=	wp.getLocationDetails();
+						if(details.getAddress().equals(address)) {
+//							Address addressDeleted = addressService.deleteAddress(details.getAddressId());
+//							if (addressDeleted == null) {
+//								WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//								workPlaceResponseEntity.setErrorCode(400);
+//								workPlaceResponseEntity.setMessage("Unable to delete WorkPlace for the given Address");
+//								return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//							} else {
+//								WorkPlaceResponseEntity workPlaceResEntity = new WorkPlaceResponseEntity();
+//								workPlaceResEntity.setStatusCode(200);
+//								workPlaceResEntity.setDescription("WorkPlace Deleted Successfully for the given Address");
+//								return new ResponseEntity(workPlaceResEntity, HttpStatus.OK);
+//							}
 						}
-					}
+//					}
 				} 
 			}
 			AttendanceResEntity userDataResEntity = new AttendanceResEntity();

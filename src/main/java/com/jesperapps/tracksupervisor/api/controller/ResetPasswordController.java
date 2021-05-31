@@ -52,8 +52,8 @@ public class ResetPasswordController{
 	UserResEntity res = new UserResEntity();
 	
 	private final Integer OTP_LENGTH = 6;
-	private final String FROM_ADDRESS = "arun.kumar@jespersoft.com";
-//	private final String FROM_ADDRESS = "arun.thril@gmail.com";
+//	private final String FROM_ADDRESS = "arun.kumar@jespersoft.com";
+	private final String FROM_ADDRESS = "arun.thril@gmail.com";
 	
 	@PostMapping("/forgotpassword")
 	public ResponseEntity forgotPassword(@RequestBody UserRequestEntity user, HttpServletRequest request) {
@@ -101,15 +101,16 @@ public class ResetPasswordController{
 					
 					props.put("mail.smtp.auth", "true");
 					props.put("mail.smtp.starttls.enable", "true");
-					props.put("mail.smtp.host", "mail.jespersoft.com");
-//					props.put("mail.smtp.host", "smtp.gmail.com");
-					props.put("mail.smtp.port", "25");
+//					props.put("mail.smtp.host", "mail.jespersoft.com");
+					props.put("mail.smtp.host", "smtp.gmail.com");
+//					props.put("mail.smtp.port", "25");
+					props.put("mail.smtp.port", "587");
 
 
 					Authenticator auth = new Authenticator() {
 						protected PasswordAuthentication getPasswordAuthentication() {
-							return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
-//							return new PasswordAuthentication(FROM_ADDRESS,"arunvenkat");
+//							return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
+						return new PasswordAuthentication(FROM_ADDRESS,"Arun12345$");
 						}
 					};
 					Session session = Session.getInstance(props, auth);

@@ -37,7 +37,7 @@ public class WorkPlaceResponseEntity extends BaseResponse{
 		this.toDate = workPlace1.getToDate();
 		this.assignedFromUser = workPlace1.getAssignedFromUser();
 		this.assignedToUser = workPlace1.getAssignedToUser();
-		this.address = workPlace1.getAddress();
+//		this.address = workPlace1.getAddress();
 		this.status = workPlace1.getStatus();
 	}
 

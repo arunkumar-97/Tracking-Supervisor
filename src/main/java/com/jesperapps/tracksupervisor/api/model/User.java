@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +83,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     cascade = CascadeType.ALL)
 	private Attachment attachment;
 	
+	@JsonIgnore
 	@OneToOne(mappedBy = "user",
 		    cascade = CascadeType.ALL)
 			private DoNotTrackSubscribers doNotTrackSubscribers;
@@ -151,6 +153,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
 	private List<LocationDetails> locationDetails;
+	
+	@JsonIgnore
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+	private OrganizationFreeTrial organizationFreeTrial;
 	
 	public User() {
 		super();
@@ -251,7 +257,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.attachment = user.getAttachment();
 		this.attendance = user.getAttendance();
 		this.userStatus = userStatus;
-	}
+		}
 
 	public User(User user, String userStatus2, String userStatus3) {
 		this.userId = user.getUserId();
@@ -409,6 +415,55 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.attachment = user.getAttachment();
 //		this.attendance = user.getAttendance();
 //		this.verificationStatus=user.getVerificationStatus();
+	}
+
+	public User(User user, User user2) {
+		// TODO Auto-generated constructor stub
+		this.userId=user.getUserId();
+		this.name=user.getName();
+		this.email=user.getEmail();
+		this.phoneNumber=user.getPhoneNumber();
+		
+	}
+
+	public User(User secondaryUserWithDoNotTrack, User secondaryUserWithDoNotTrack2,
+			User secondaryUserWithDoNotTrack3) {
+		// TODO Auto-generated constructor stub
+		this.userId=secondaryUserWithDoNotTrack.getUserId();
+		this.name=secondaryUserWithDoNotTrack.getName();
+		this.email=secondaryUserWithDoNotTrack.getEmail();
+		this.phoneNumber=secondaryUserWithDoNotTrack.getPhoneNumber();
+	}
+
+	public User(UserRequestEntity userRequestEntity, UserRequestEntity userRequestEntity2,
+			UserRequestEntity userRequestEntity3) {
+		this.userId = userRequestEntity.getUserId();
+		this.name = userRequestEntity.getName();
+		this.phoneNumber = userRequestEntity.getPhoneNumber();
+		this.email = userRequestEntity.getEmail();
+		this.password=userRequestEntity.getPassword();
+		this.alternatePhoneNumber = userRequestEntity.getAlternatePhoneNumber();
+		this.address=userRequestEntity.getAddress();
+		this.postalCode=userRequestEntity.getPostalCode();
+		this.authenticationType=userRequestEntity.getAuthenticationType();
+		this.userType = userRequestEntity.getUserType();
+		this.country=userRequestEntity.getCountry();
+		this.states=userRequestEntity.getStates();
+		this.city=userRequestEntity.getCity();
+		this.userType=userRequestEntity.getUserType();
+		if (userRequestEntity.getAttachment() == null) {
+
+		} else {
+			this.attachment = userRequestEntity.getAttachment();
+			this.attachment.setUser(this);
+		}
+		this.createdByUser = userRequestEntity.getCreatedByUser();
+		this.timeTracking = userRequestEntity.getTimeTracking();
+		if(userRequestEntity.getTimeTracking() != null) {
+			this.timeTracking.forEach(x -> x.setUser(this));
+		}
+		
+		this.organization = userRequestEntity.getOrganization();
 	}
 
 	public ConfirmationToken getOtpToken() {
@@ -697,7 +752,30 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setDoNotTrackSubscribers(DoNotTrackSubscribers doNotTrackSubscribers) {
 		this.doNotTrackSubscribers = doNotTrackSubscribers;
 	}
+
+	public OrganizationFreeTrial getOrganizationFreeTrial() {
+		return organizationFreeTrial;
+	}
+
+	public void setOrganizationFreeTrial(OrganizationFreeTrial organizationFreeTrial) {
+		this.organizationFreeTrial = organizationFreeTrial;
+	}
 	
+	
+	
+	//primary user and secondary user
+//	public void addPrimaryUser(SecondaryUser primaryAndSecondaryUser) {
+//		if(this.primaryUser != null) {
+//			this.primaryUser=new HashSet<>();
+//		}
+//		this.primaryUser.add(primaryAndSecondaryUser);
+//	}
+//	public void addSecondaryUser(SecondaryUser primaryAndSecondaryUser) {
+//		if(this.SecondaryUser != null) {
+//			this.SecondaryUser=new HashSet<>();
+//		}
+//		this.SecondaryUser.add(primaryAndSecondaryUser);
+//	}
 	
 	
 

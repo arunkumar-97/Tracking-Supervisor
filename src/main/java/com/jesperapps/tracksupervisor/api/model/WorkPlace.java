@@ -30,9 +30,9 @@ public class WorkPlace {
 	private Time endTime;
 	private String timeInterval;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "workPlace", cascade = CascadeType.ALL)
-	private List<Address> address;
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "workPlace", cascade = CascadeType.ALL)
+//	private List<Address> address;
 
 	@ManyToOne
 	@JoinColumn
@@ -48,7 +48,7 @@ public class WorkPlace {
 	
 	
 	@ManyToOne
-	@JoinColumn(name="locationDetails_Id")
+	@JoinColumn(name="locationDetails_Id" , referencedColumnName = "locationId")
 	private LocationDetails locationDetails;
 
 	public WorkPlace() {
@@ -62,8 +62,8 @@ public class WorkPlace {
 		this.toDate = workPlaceReqEntity.getToDate();
 		this.assignedFromUser = workPlaceReqEntity.getAssignedFromUser();
 		this.assignedToUser = workPlaceReqEntity.getAssignedToUser();
-		this.address = workPlaceReqEntity.getAddress();
-		this.address.forEach(x -> x.setWorkPlace(this));
+//		this.address = workPlaceReqEntity.getAddress();
+//		this.address.forEach(x -> x.setWorkPlace(this));
 		this.status = workPlaceReqEntity.getStatus();
 		this.startTime=workPlaceReqEntity.getStartTime();
 		this.endTime=workPlaceReqEntity.getEndTime();
@@ -76,7 +76,7 @@ public class WorkPlace {
 		this.workPlaceId = workPlace.getWorkPlaceId();
 		this.fromDate = workPlace.getFromDate();
 		this.toDate = workPlace.getToDate();
-		this.address = workPlace.getAddress();
+//		this.address = workPlace.getAddress();
 		this.assignedFromUser = workPlace.getAssignedFromUser();
 		this.assignedToUser = workPlace.getAssignedToUser();
 		this.status = workPlace.getStatus();
@@ -131,14 +131,14 @@ public class WorkPlace {
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
 	}
-
-	public List<Address> getAddress() {
-		return address;
-	}
-
-	public void setAddress(List<Address> address) {
-		this.address = address;
-	}
+//
+//	public List<Address> getAddress() {
+//		return address;
+//	}
+//
+//	public void setAddress(List<Address> address) {
+//		this.address = address;
+//	}
 
 	public User getAssignedFromUser() {
 		return assignedFromUser;

@@ -1,12 +1,17 @@
 package com.jesperapps.tracksupervisor.api.message;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jesperapps.tracksupervisor.api.model.Status;
 
 public class FreeTrialReqEntity {
 	
 	private Integer freeTrialId;
+	public String freeTrialName;
 	private Integer noOfDays;
 	private Status status;
+	@JsonProperty
+	private boolean isDefault;
+
 	
 	
 	public Integer getFreeTrialId() {
@@ -26,6 +31,18 @@ public class FreeTrialReqEntity {
 	}
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	public String getFreeTrialName() {
+		return freeTrialName;
+	}
+	public void setFreeTrialName(String freeTrialName) {
+		this.freeTrialName = freeTrialName;
+	}
+	public boolean isDefault() {
+		return isDefault;
+	}
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 	
 	

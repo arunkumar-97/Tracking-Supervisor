@@ -28,6 +28,8 @@ public interface DoNotTrackService {
 
 	Iterable<DoNotTrack> findByUserAndApprovalStatus(Optional<User> userFromDb, Optional<ApprovalStatus> approvalStatusFromDb);
 
-	
+	DoNotTrack findByUser_UserId(Long userId);
+
+//	DoNotTrack findByUserId(Long userId);
 
 }

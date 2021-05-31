@@ -25,6 +25,10 @@ public class OrganizationFreeTrial {
 	@JoinColumn(name = "organization")
 	private Organization organization;
 	
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "userId")
+	private User user;
+	
 	
 	@ManyToOne
 	@JoinColumn
@@ -84,6 +88,14 @@ public class OrganizationFreeTrial {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	

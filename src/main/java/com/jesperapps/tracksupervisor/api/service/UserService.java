@@ -42,7 +42,7 @@ public interface UserService {
 	
 	List<User> findAllByEmail(String email);
 
-	Optional<User> findByPhoneNumber(String phoneNumber);
+	User findByPhoneNumber(String phoneNumber);
 
 	void sendSms(String string, String phone);
 

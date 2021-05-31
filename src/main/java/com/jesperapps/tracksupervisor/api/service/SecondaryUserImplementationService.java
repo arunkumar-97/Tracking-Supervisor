@@ -27,4 +27,10 @@ public class SecondaryUserImplementationService implements SecondaryUserService{
 		// TODO Auto-generated method stub
 		return secondaryUserRepository.findAllByPrimaryUser(user);
 	}
+
+	@Override
+	public SecondaryUser findBySecondaryUser(User user) {
+		// TODO Auto-generated method stub
+		return this.secondaryUserRepository.findBySecondaryUser_UserId(user.getUserId());
+	}
 }

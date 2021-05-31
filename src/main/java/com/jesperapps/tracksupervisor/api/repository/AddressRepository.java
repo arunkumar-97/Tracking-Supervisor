@@ -7,6 +7,6 @@ import com.jesperapps.tracksupervisor.api.model.WorkPlace;
 
 public interface AddressRepository extends JpaRepository<Address, Long>{
 
-	Address findByWorkPlaceAndAddressName(WorkPlace workPlaceData, String address);
+//	Address findByWorkPlaceAndAddressName(WorkPlace workPlaceData, String address);
 
 }

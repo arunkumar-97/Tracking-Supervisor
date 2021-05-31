@@ -20,8 +20,9 @@ public class FreeTrial {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer freeTrialId;
+	public String freeTrialName;
 	private Integer noOfDays;
-	
+	private boolean isDefault;
 	
 	@ManyToOne
 	@JoinColumn
@@ -37,8 +38,10 @@ public class FreeTrial {
 	}
 	public FreeTrial(FreeTrialReqEntity reqEntity) {
 		this.freeTrialId=reqEntity.getFreeTrialId();
+		this.freeTrialName=reqEntity.getFreeTrialName();
 		this.noOfDays=reqEntity.getNoOfDays();
 		this.status=reqEntity.getStatus();
+		this.isDefault=reqEntity.isDefault();
 	}
 
 
@@ -69,6 +72,24 @@ public class FreeTrial {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	public String getFreeTrialName() {
+		return freeTrialName;
+	}
+	public void setFreeTrialName(String freeTrialName) {
+		this.freeTrialName = freeTrialName;
+	}
+	public boolean isDefault() {
+		return isDefault;
+	}
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
+	}
+	public List<OrganizationFreeTrial> getOrganizationFreeTrial() {
+		return organizationFreeTrial;
+	}
+	public void setOrganizationFreeTrial(List<OrganizationFreeTrial> organizationFreeTrial) {
+		this.organizationFreeTrial = organizationFreeTrial;
 	}
 	
 	

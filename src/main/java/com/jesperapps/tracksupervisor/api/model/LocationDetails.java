@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -48,6 +49,15 @@ public class LocationDetails {
 		this.organization=reqEntity.getOrganization();
 		this.user=reqEntity.getUser();
 	}
+	public LocationDetails(LocationDetailsRequestEntity organizationRequestEntity, Optional<LocationDetails> id) {
+		this.locationId=organizationRequestEntity.getLocationId();
+		this.latitude=organizationRequestEntity.getLatitude();
+		this.longitude=organizationRequestEntity.getLongitude();
+		this.address=id.get().getAddress();
+		this.organization=id.get().getOrganization();
+		this.user=id.get().getUser();
+	}
+
 	public Integer getLocationId() {
 		return locationId;
 	}

@@ -31,11 +31,11 @@ public class WorkPlaceServiceImpl implements WorkPlaceService{
 		return workPlaceRepository.findAllByAssignedFromUserAndAssignedToUser(assignedFromUser, assignedToUser);
 	}
 
-	@Override
-	public WorkPlace findByFromDateAndToDateIsBetweenAndAddress(Date fromDate, Date toDate, String addressName) {
-		// TODO Auto-generated method stub
-		return workPlaceRepository.findByFromDateIsBetweenAndAddress(fromDate, toDate, addressName);
-	}
+//	@Override
+//	public WorkPlace findByFromDateAndToDateIsBetweenAndAddress(Date fromDate, Date toDate, String addressName) {
+//		// TODO Auto-generated method stub
+//		return workPlaceRepository.findByFromDateIsBetweenAndAddress(fromDate, toDate, addressName);
+//	}
 
 	@Override
 	public List<WorkPlace> findAllByAssignedToUser(User assignedToUserId) {

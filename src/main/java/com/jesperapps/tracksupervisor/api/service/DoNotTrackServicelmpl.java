@@ -64,6 +64,19 @@ public class DoNotTrackServicelmpl implements DoNotTrackService {
 		return doNotTrackRepository.findByUserAndApprovalstatus(userFromDb,approvalStatusFromDb);
 	}
 
+	@Override
+	public DoNotTrack findByUser_UserId(Long userId) {
+		// TODO Auto-generated method stub
+		return doNotTrackRepository.findByUser_UserId(userId);
+	}
+
+//	@Override
+//	public User findByUserId(Long userId) {
+//		// TODO Auto-generated method stub
+//		DoNotTrack doNotTrackFromDB = this.doNotTrackRepository.findByUser_userId(userId);
+//		return doNotTrackFromDB != null ? doNotTrackFromDB.getUser() : null;
+//	}
+
 
 	
 }
