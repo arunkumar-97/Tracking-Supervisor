@@ -58,6 +58,7 @@ public class ReportsController {
 	public ResponseEntity ListAttendanceByDate(@PathVariable("fromDate") Date fromDate,
 			@PathVariable("toDate") Date toDate, @PathVariable Long userId) {
 		System.out.println("fromDate" + fromDate);
+		List<ReportsResponseEntity> attendanceResponseEntity1 = new ArrayList<ReportsResponseEntity>();
 
 		Optional<User> userData = userService.findById(userId);
 		if (userData == null) {
@@ -78,15 +79,15 @@ public class ReportsController {
 
 		List<Reports> reports = reportsService.findAllByUserAndDateBetween(user, fromDate, toDate);
 		System.out.println("attendance" + reports);
-		if (reports.isEmpty()) {
+		if (reports == null) {
 			System.out.println("i");
 			ReportsResponseEntity reportsResponseEntity = new ReportsResponseEntity();
 			reportsResponseEntity.setErrorCode(204);
 			reportsResponseEntity.setMessage("No Data is Available");
 			return new ResponseEntity(reportsResponseEntity, HttpStatus.NOT_FOUND);
 		} else {
-			List<ReportsResponseEntity> attendanceResponseEntity1 = new ArrayList<ReportsResponseEntity>();
-			for (Reports report : reports) {
+			System.out.println("check");
+			for(Reports report : reports) {
 				System.out.println("for");
 				if (report.getStatus() == null || report.getStatus().equals("Active") || report.getStatus().equals("InActive")
 						|| report.getStatus().equals("Pending")) {
@@ -100,6 +101,7 @@ public class ReportsController {
 			}
 			if (attendanceResponseEntity1.isEmpty()) {
 				System.out.println("iff");
+				System.out.println("iffee");
 				ReportsResponseEntity attendanceResEntity = new ReportsResponseEntity();
 				attendanceResEntity.setErrorCode(204);
 				attendanceResEntity.setMessage("No Data is Available");

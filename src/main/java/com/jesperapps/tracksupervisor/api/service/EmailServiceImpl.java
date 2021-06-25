@@ -238,7 +238,7 @@ public class EmailServiceImpl implements EmailService {
 			Authenticator auth = new Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 //					return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
-					return new PasswordAuthentication(FROM_ADDRESS,"Arun12345$");
+					return new PasswordAuthentication(FROM_ADDRESS,"Arun12345@");
 				}
 			};
 			Session session = Session.getInstance(props, auth);
@@ -315,7 +315,7 @@ public class EmailServiceImpl implements EmailService {
 
 				Authenticator auth = new Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(FROM_ADDRESS,"arunvenkat");
+						return new PasswordAuthentication(FROM_ADDRESS,"Arun12345@");
 					}
 				};
 				Session session = Session.getInstance(props, auth);

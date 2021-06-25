@@ -18,8 +18,8 @@ public interface OtpSmsService {
 
 	List<OtpSms> findAll();
 
-	Optional<OtpSms> getOtp(String phoneNumber);
+	OtpSms getOtp(String phoneNumber);
 
-	Optional<OtpSms> findByPhoneNumber(String phoneNumber);
+	OtpSms findByPhoneNumber(String phoneNumber);
 
 }

@@ -35,10 +35,13 @@ public class WorkPlaceResponseEntity extends BaseResponse{
 		this.workPlaceId = workPlace1.getWorkPlaceId();
 		this.fromDate = workPlace1.getFromDate();
 		this.toDate = workPlace1.getToDate();
+		this.startTime=workPlace1.getStartTime();
+		this.endTime=workPlace1.getEndTime();
 		this.assignedFromUser = workPlace1.getAssignedFromUser();
 		this.assignedToUser = workPlace1.getAssignedToUser();
 //		this.address = workPlace1.getAddress();
 		this.status = workPlace1.getStatus();
+		this.locationDetails=workPlace1.getLocationDetails();
 	}
 
 	

@@ -14,6 +14,8 @@ public interface OtpSmsRepository extends JpaRepository<OtpSms, Long> {
 
 	List<OtpSms> findAllByPhoneNumber(String phone);
 
-	Optional<OtpSms> findByPhoneNumber(String phoneNumber);
+//	Optional<OtpSms> findByPhoneNumber(String phoneNumber);
 
+	
+	OtpSms findByPhoneNumber(String phoneNumber);
 }

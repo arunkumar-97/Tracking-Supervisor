@@ -9,7 +9,9 @@ import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.OrganizationFreeTrial;
 import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
@@ -39,6 +41,9 @@ public class UserRequestEntity {
 	private List<TimeTracking> timeTracking;
 	private Organization organization;
 	private String otp;
+	private OrganizationFreeTrial organizationFreeTrial;
+
+	private FreeTrial freeTrial;
 
 	public UserRequestEntity() {
 	
@@ -71,6 +76,9 @@ public class UserRequestEntity {
 		}
 		this.createdByUser = user.getCreatedByUser();
 		this.organization = user.getOrganization();
+		this.organizationFreeTrial=user.getOrganizationFreeTrial();
+
+	
 	}
 
 	public UserRequestEntity(Optional<User> user2, User user, Long userId2) {
@@ -87,6 +95,8 @@ public class UserRequestEntity {
 		}
 		this.createdByUser = user.getCreatedByUser();
 		this.organization = user.getOrganization();
+		this.organizationFreeTrial=user.getOrganizationFreeTrial();
+		
 	}
 
 	public UserRequestEntity(User userData2, User userData3) {
@@ -301,6 +311,24 @@ public class UserRequestEntity {
 
 	public void setOtp(String otp) {
 		this.otp = otp;
+	}
+
+	public FreeTrial getFreeTrial() {
+		return freeTrial;
+	}
+
+	public void setFreeTrial(FreeTrial freeTrial) {
+		this.freeTrial = freeTrial;
+	}
+	
+	
+
+	public OrganizationFreeTrial getOrganizationFreeTrial() {
+		return organizationFreeTrial;
+	}
+
+	public void setOrganizationFreeTrial(OrganizationFreeTrial organizationFreeTrial) {
+		this.organizationFreeTrial = organizationFreeTrial;
 	}
 
 	@Override

@@ -117,6 +117,13 @@ public class Reports {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+	@Override
+	public String toString() {
+		return "Reports [reportId=" + reportId + ", date=" + date + ", time=" + time + ", latitude=" + latitude
+				+ ", longitude=" + longitude + ", noOfWorkers=" + noOfWorkers + ", day=" + day + ", address=" + address
+				+ ", status=" + status + ", userStatus=" + userStatus + ", user=" + user + "]";
+	}
 	
 	
 	

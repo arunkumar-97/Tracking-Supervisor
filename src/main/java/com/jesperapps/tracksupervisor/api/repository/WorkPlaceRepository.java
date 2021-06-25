@@ -22,4 +22,5 @@ public interface WorkPlaceRepository extends JpaRepository<WorkPlace, Long>{
 
 	List<WorkPlace> findAllByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate);
 
+
 }

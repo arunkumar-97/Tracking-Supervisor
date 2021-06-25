@@ -6,6 +6,7 @@ import java.util.List;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.IndustryType;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.Status;
@@ -32,6 +33,8 @@ public class OrganizationRequestEntity {
 	private List<User> user;
 	private Status status;
 	private String gstNumber;
+	private FreeTrial freeTrial;
+
 	
 	
 	
@@ -151,6 +154,12 @@ public class OrganizationRequestEntity {
 	}
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	public FreeTrial getFreeTrial() {
+		return freeTrial;
+	}
+	public void setFreeTrial(FreeTrial freeTrial) {
+		this.freeTrial = freeTrial;
 	}
 
 	

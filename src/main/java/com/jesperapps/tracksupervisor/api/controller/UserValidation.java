@@ -144,7 +144,11 @@ public class UserValidation {
 //		     		System.out.println(userFromDb);	
 //		      		System.out.println("Login Successfull");
 					Organization orgfromdb=userFromDb.getOrganization();
-					if(orgfromdb == null ) {
+					if(orgfromdb == null ) {	OrganizationFreeTrial	freeTrial=userFromDb.getOrganizationFreeTrial();
+					if(freeTrial!=null) {
+					Date currentDate=new Date();
+					Date endDate=freeTrial.getEndDate();
+					if(currentDate.before(endDate) || currentDate.equals(endDate)) {
 						UserResponseEntity response=new UserResponseEntity(userFromDb,userFromDb);
 						
 						
@@ -153,6 +157,20 @@ public class UserValidation {
 						response.setDescription("Login Successfull");
 						return  new ResponseEntity(response, HttpStatus.OK);
 					}else {
+						
+						
+						UserResponseEntity response1=new UserResponseEntity();
+						response1.setStatusCode(409);
+						response1.setDescription("Your FreeTrial has been Expired.Please Subscribe to Login");
+						return new ResponseEntity(response1, HttpStatus.CONFLICT); 
+					}
+					
+					}else {
+						UserResponseEntity response=new UserResponseEntity(userFromDb,userFromDb);
+						response.setStatusCode(200);
+						response.setDescription("Login Successfull");
+						return  new ResponseEntity(response, HttpStatus.OK);
+					}}else {
 					OrganizationFreeTrial	freeTrial=orgfromdb.getOrganizationFreeTrial();
 					if(freeTrial!=null) {
 					Date currentDate=new Date();
@@ -165,14 +183,14 @@ public class UserValidation {
 						response.setStatusCode(200);
 						response.setDescription("Login Successfull");
 						return  new ResponseEntity(response, HttpStatus.OK);
+					}else {
+						
+						
+						UserResponseEntity response1=new UserResponseEntity();
+						response1.setStatusCode(409);
+						response1.setDescription("Your FreeTrial has been Expired.Please Subscribe to Login");
+						return new ResponseEntity(response1, HttpStatus.CONFLICT); 
 					}
-						
-						
-//						UserResponseEntity response1=new UserResponseEntity();
-//						response1.setStatusCode(409);
-//						response1.setDescription("Your FreeTrial has been Expired.Please Subscribe to Login");
-//						return new ResponseEntity(response1, HttpStatus.CONFLICT); 
-					
 					
 					}else {
 						UserResponseEntity response=new UserResponseEntity(userFromDb,userFromDb);
@@ -208,7 +226,7 @@ public class UserValidation {
 		 return new ResponseEntity(response3, HttpStatus.CONFLICT);
 	}
 //		return new ResponseEntity(response2, HttpStatus.CONFLICT);
-		return null;
+		
 		
 		
 	}

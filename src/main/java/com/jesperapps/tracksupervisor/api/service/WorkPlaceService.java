@@ -27,4 +27,7 @@ public interface WorkPlaceService {
 
 	List<WorkPlace> findAllByAssignedToUserAndFromDateAndToDate(User assignedToUser, Date fromDate, Date toDate);
 
+
+//	User findAllByAssignedToUser(Long assignedToUserId);
+
 }

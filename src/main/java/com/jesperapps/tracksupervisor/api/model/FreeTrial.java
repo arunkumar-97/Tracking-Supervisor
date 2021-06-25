@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -45,6 +46,20 @@ public class FreeTrial {
 	}
 
 
+	public FreeTrial(FreeTrialReqEntity freeTrialReqEntity, Optional<FreeTrial> id) {
+		this.freeTrialId= id.get().getFreeTrialId();
+		this.freeTrialName=id.get().getFreeTrialName();
+		this.noOfDays=id.get().getNoOfDays();
+		this.status=id.get().getStatus();
+		this.isDefault=freeTrialReqEntity.isDefault();
+	}
+	public FreeTrial(FreeTrialReqEntity freeTrialReqEntity, FreeTrialReqEntity freeTrialReqEntity2) {
+		this.freeTrialId= freeTrialReqEntity.getFreeTrialId();
+		this.freeTrialName=freeTrialReqEntity.getFreeTrialName();
+		this.noOfDays=freeTrialReqEntity.getNoOfDays();
+		this.status=freeTrialReqEntity.getStatus();
+		this.isDefault=freeTrialReqEntity.isDefault();
+	}
 	public Integer getFreeTrialId() {
 		return freeTrialId;
 	}

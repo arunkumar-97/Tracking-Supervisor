@@ -6,8 +6,10 @@ import com.jesperapps.tracksupervisor.api.extra.BaseResponse;
 import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.IndustryType;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.OrganizationFreeTrial;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.Status;
 import com.jesperapps.tracksupervisor.api.model.User;
@@ -33,6 +35,10 @@ public class OrganizationResponseEntity extends BaseResponse{
 	private List<User> user;
 	private Status status;
 	private String gstNumber;
+	private FreeTrial freeTrial;
+	private OrganizationFreeTrial organizationFreeTrial;
+
+
 	
 	public OrganizationResponseEntity() {
 		
@@ -60,7 +66,18 @@ public class OrganizationResponseEntity extends BaseResponse{
 		this.city=organization.getCity();
 		this.status=organization.getStatus();
 		this.gstNumber=organization.getGstNumber();
+		this.organizationFreeTrial=organization.getOrganizationFreeTrial();
 		this.user=organization.getUser();
+	}
+
+
+	public OrganizationResponseEntity(Organization organization, Organization organization2) {
+		this.organizationId = organization.getOrganizationId();
+		this.organizationName = organization.getOrganizationName();
+		this.contactPhoneNumber=organization.getContactPhoneNumber();
+		this.contactEmail=organization.getContactEmail();
+		this.status = organization.getStatus();
+		
 	}
 
 
@@ -191,6 +208,26 @@ public class OrganizationResponseEntity extends BaseResponse{
 	}
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+
+	public FreeTrial getFreeTrial() {
+		return freeTrial;
+	}
+
+
+	public void setFreeTrial(FreeTrial freeTrial) {
+		this.freeTrial = freeTrial;
+	}
+
+
+	public OrganizationFreeTrial getOrganizationFreeTrial() {
+		return organizationFreeTrial;
+	}
+
+
+	public void setOrganizationFreeTrial(OrganizationFreeTrial organizationFreeTrial) {
+		this.organizationFreeTrial = organizationFreeTrial;
 	}
 	
 	

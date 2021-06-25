@@ -140,15 +140,18 @@ public class Organization extends AbstractAuditingEntity implements Serializable
 //	}
 
 	public Organization(Organization organization, Integer employeeId) {
-		super();
+		
 		this.organizationId = organization.getOrganizationId();
 		this.organizationName = organization.getOrganizationName();
+		this.organizationFreeTrial=organization.getOrganizationFreeTrial();
 	}
 
 	public Organization(Organization organization) {
 		super();
 		this.organizationId = organization.getOrganizationId();
 		this.organizationName = organization.getOrganizationName();
+		this.organizationFreeTrial=organization.getOrganizationFreeTrial();
+
 //		if(organization.getAttachment() != null) {
 //			this.attachment = organization.getAttachment();
 //			this.attachment.setOrganization(this);

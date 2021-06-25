@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.repository;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,6 @@ public interface DoNotTrackRepository extends JpaRepository<DoNotTrack, Integer>
 	DoNotTrack findByUser_userId(Long userId);
 
 	DoNotTrack findByUser_UserId(Long userId);
+
+	List<DoNotTrack> findAllByUser_UserId(Long userId);
 }

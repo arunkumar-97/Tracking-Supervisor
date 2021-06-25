@@ -627,7 +627,7 @@ public class UserController{
 			Authenticator auth = new Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 //					return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
-					return new PasswordAuthentication(FROM_ADDRESS,"Arun12345$");
+					return new PasswordAuthentication(FROM_ADDRESS,"Arun12345@");
 				}
 			};
 			Session session = Session.getInstance(props, auth);
@@ -950,6 +950,8 @@ public class UserController{
 			userType.add(uType);
 			user.setUserType(userType);
 		}
+
+		
 		
 		
 		User emailFromDb=		userService.findUserByEmail(userRequestEntity.getEmail());
@@ -1075,7 +1077,7 @@ public class UserController{
 	
 		
 		
-		return postUser(user);
+		return postUser(user,userRequestEntity);
 		
 		
 	
@@ -1534,7 +1536,7 @@ public class UserController{
 	}
 
 	@SuppressWarnings("unlikely-arg-type")
-	private ResponseEntity postUser(User user) {
+	private ResponseEntity postUser(User user,UserRequestEntity userRequestEntity) {
 		System.out.println("User :" + user);
 		Optional<User> userData = userService.createUser(user);
 		System.out.println("userData " + userData);
@@ -1605,6 +1607,29 @@ public class UserController{
 ////					userResponseEntity.setMessage("Unable to Send Mail");
 ////					return new ResponseEntity(userResponseEntity, HttpStatus.CONFLICT);
 //				}
+		OrganizationFreeTrial orgFreeTrial=new OrganizationFreeTrial();
+		orgFreeTrial.setUser(userData.get());
+		orgFreeTrial.setFreeTrial(userRequestEntity.getFreeTrial());
+		Date date=new Date();
+		orgFreeTrial.setStartDate(date);
+		if(userRequestEntity.getFreeTrial() != null) {
+			Optional<FreeTrial> freetrial=freeTrialService.findById(userRequestEntity.getFreeTrial().getFreeTrialId());
+			Integer noofdays = freetrial.get().getNoOfDays();
+			Date endate = new Date();
+			    endate.setDate(endate.getDate() + noofdays);
+			    orgFreeTrial.setEndDate(endate);
+			    
+			    
+			    
+			    System.out.println("StartDate :" + date);
+			    System.out.println("StartDate :" + endate);
+			    Status status=new Status();
+			    status.setStatusId((long) 1);
+			    orgFreeTrial.setStatus(status);  
+			    organizationFreeTrialService.save(orgFreeTrial);
+		}
+		
+		
 				UserRequestEntity userReqEntity = new UserRequestEntity(userData.get());
 				UserResEntity userResponseEntity = new UserResEntity(userReqEntity);
 				Set<UserType> ut = new HashSet<UserType>();
@@ -2083,7 +2108,7 @@ public class UserController{
 		Optional<User> userDatas = userService.findById(userRequestEntity.getUserId());
 		System.out.println("userDatas"+userDatas);
 		if (userDatas.isPresent()) {
-			User users = new User(userRequestEntity.getUserId(), userRequestEntity);
+			User users = new User(userDatas.get(), userRequestEntity,userRequestEntity);
 			users.setCreatedByUser(userDatas.get().getCreatedByUser());
 			System.out.println("UserType :" + users.getUserType());
 			
@@ -2337,6 +2362,10 @@ public class UserController{
 						Organization organization = new Organization(userRequestEntity.getOrganization(),
 								userRequestEntity.getOrganization().getOrganizationId());
 						userRequestEntity.setOrganization(organization);
+					}
+					if(userRequestEntity.getOrganizationFreeTrial() != null) {
+						OrganizationFreeTrial organizationFreeTrial=new OrganizationFreeTrial(userRequestEntity.getOrganizationFreeTrial());
+						userRequestEntity.setOrganizationFreeTrial(organizationFreeTrial);
 					}
 
 					Set<UserType> userTypes = new HashSet<UserType>();

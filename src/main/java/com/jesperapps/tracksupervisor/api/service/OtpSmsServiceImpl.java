@@ -25,17 +25,29 @@ public class OtpSmsServiceImpl implements OtpSmsService {
 
 	@Override
 	public int generateOTP(String phoneNumber) {
+		System.out.println("ph "+ phoneNumber);
 		try {
+			OtpSms otpFromDb = this.otpSmsRepository.findByPhoneNumber(phoneNumber);
+			System.out.println("otpFromDb" + otpFromDb);
 			Random random = new Random();
 			int otp = 100000 + random.nextInt(900000);
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 			LocalDateTime now = LocalDateTime.now();
 			String otpGenerationTime = dtf.format(now);
-			OtpSms otpSms = new OtpSms(phoneNumber, otp, EXPIRE_MINS, otpGenerationTime);
+			OtpSms otpSms;
+			if(otpFromDb == null){
+				otpSms = new OtpSms(phoneNumber, otp, EXPIRE_MINS, otpGenerationTime);				
+			}else {
+				otpSms = otpFromDb;
+				otpSms.setOtp(otp);
+				otpSms.setExpireMins(EXPIRE_MINS);
+				otpSms.setOtpGenerationTime(otpGenerationTime);
+			}
 			@SuppressWarnings("unused")
 			OtpSms otpSmsSaved = otpSmsRepository.save(otpSms);
 			return otp;
 		} catch (Exception e) {
+			System.out.println("Exc" +e.getLocalizedMessage());
 			return 0;
 		}
 
@@ -77,10 +89,10 @@ public class OtpSmsServiceImpl implements OtpSmsService {
 	
 	
 	@Override
-	public Optional<OtpSms> getOtp(String phoneNumber) {
+	public OtpSms getOtp(String phoneNumber) {
 		System.out.println("phoneNumber" + phoneNumber);
 		try {
-			Optional<OtpSms> sms = this.findByPhoneNumber(phoneNumber);
+			OtpSms sms = this.findByPhoneNumber(phoneNumber);
 			System.out.println("sms" + sms);
 			return sms;
 		} catch (Exception e) {
@@ -91,7 +103,7 @@ public class OtpSmsServiceImpl implements OtpSmsService {
 	}
 	
 	@Override
-	public Optional<OtpSms> findByPhoneNumber(String phoneNumber) {
+	public OtpSms findByPhoneNumber(String phoneNumber) {
 		return otpSmsRepository.findByPhoneNumber(phoneNumber);
 	}
 

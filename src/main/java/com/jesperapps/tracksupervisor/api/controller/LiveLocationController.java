@@ -86,8 +86,10 @@ public class LiveLocationController {
 		if (userFromDb != null) {
 
 			liveLocationService.findByUser(userFromDb).forEach(user-> {
-				
-					response.add(new LiveLocationResEntity(user));
+				LiveLocationResEntity liveLocationResEntity=new LiveLocationResEntity(user);
+				User u=new User(liveLocationResEntity.getUser(),liveLocationResEntity.getUser());
+				liveLocationResEntity.setUser(u);
+					response.add(liveLocationResEntity);
 				
 
 			});

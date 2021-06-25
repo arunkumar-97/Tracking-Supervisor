@@ -53,9 +53,25 @@ public class LocationDetails {
 		this.locationId=organizationRequestEntity.getLocationId();
 		this.latitude=organizationRequestEntity.getLatitude();
 		this.longitude=organizationRequestEntity.getLongitude();
-		this.address=id.get().getAddress();
+		this.address=organizationRequestEntity.getAddress();
 		this.organization=id.get().getOrganization();
 		this.user=id.get().getUser();
+	}
+
+	public LocationDetails(LocationDetails organizationRequestEntity) {
+		this.locationId=organizationRequestEntity.getLocationId();
+		this.latitude=organizationRequestEntity.getLatitude();
+		this.longitude=organizationRequestEntity.getLongitude();
+		this.address=organizationRequestEntity.getAddress();
+		this.organization=organizationRequestEntity.getOrganization();
+		this.user=organizationRequestEntity.getUser();
+	}
+
+	public LocationDetails(LocationDetails locationDetails, LocationDetails locationDetails2) {
+		this.locationId=locationDetails.getLocationId();
+		this.latitude=locationDetails.getLatitude();
+		this.longitude=locationDetails.getLongitude();
+		this.address=locationDetails.getAddress();
 	}
 
 	public Integer getLocationId() {

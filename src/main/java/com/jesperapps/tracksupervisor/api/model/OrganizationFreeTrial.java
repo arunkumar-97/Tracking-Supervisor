@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class OrganizationFreeTrial {
 
@@ -21,10 +23,13 @@ public class OrganizationFreeTrial {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer organizationFreeTrialId;
 	
+	
+	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "organization")
 	private Organization organization;
 	
+	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "userId")
 	private User user;
@@ -41,6 +46,17 @@ public class OrganizationFreeTrial {
 	@ManyToOne
 	@JoinColumn
 	private Status status;
+
+	public OrganizationFreeTrial() {
+		
+	}
+	
+	public OrganizationFreeTrial(OrganizationFreeTrial organizationFreeTrial) {
+		this.organizationFreeTrialId=organizationFreeTrial.getOrganizationFreeTrialId();
+		this.startDate=organizationFreeTrial.getStartDate();
+		this.endDate=organizationFreeTrial.getEndDate();
+		this.freeTrial=organizationFreeTrial.getFreeTrial();
+	}
 
 	public Integer getOrganizationFreeTrialId() {
 		return organizationFreeTrialId;

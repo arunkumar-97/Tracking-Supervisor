@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 
 import com.jesperapps.tracksupervisor.api.extra.Response;
@@ -29,6 +30,8 @@ public interface DoNotTrackService {
 	Iterable<DoNotTrack> findByUserAndApprovalStatus(Optional<User> userFromDb, Optional<ApprovalStatus> approvalStatusFromDb);
 
 	DoNotTrack findByUser_UserId(Long userId);
+
+	List<DoNotTrack> findAllByUser_UserId(Long userId);
 
 //	DoNotTrack findByUserId(Long userId);
 

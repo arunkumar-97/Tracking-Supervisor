@@ -8,7 +8,9 @@ import com.jesperapps.tracksupervisor.api.model.Attachment;
 import com.jesperapps.tracksupervisor.api.model.Attendance;
 import com.jesperapps.tracksupervisor.api.model.City;
 import com.jesperapps.tracksupervisor.api.model.Country;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.Organization;
+import com.jesperapps.tracksupervisor.api.model.OrganizationFreeTrial;
 import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
 import com.jesperapps.tracksupervisor.api.model.State;
 import com.jesperapps.tracksupervisor.api.model.TimeTracking;
@@ -38,6 +40,8 @@ public class UserResponseEntity extends BaseResponse{
 	private Set<Attendance> attendance;
 	private List<TimeTracking> timeTracking;
 	private Organization organization;
+	private FreeTrial freeTrial;
+	private OrganizationFreeTrial organizationFreeTrial;
 
 	
 	public UserResponseEntity() {
@@ -57,6 +61,8 @@ public class UserResponseEntity extends BaseResponse{
 		this.attachment = userRequestEntity.getAttachment();
 		this.createdByUser = userRequestEntity.getCreatedByUser();
 		this.organization = userRequestEntity.getOrganization();
+		this.organizationFreeTrial=userRequestEntity.getOrganizationFreeTrial();
+		this.freeTrial=userRequestEntity.getFreeTrial();
 	}
 
 
@@ -279,6 +285,24 @@ public class UserResponseEntity extends BaseResponse{
 
 	public void setOrganization(Organization organization) {
 		this.organization = organization;
+	}
+
+	public FreeTrial getFreeTrial() {
+		return freeTrial;
+	}
+
+	public void setFreeTrial(FreeTrial freeTrial) {
+		this.freeTrial = freeTrial;
+	}
+	
+	
+
+	public OrganizationFreeTrial getOrganizationFreeTrial() {
+		return organizationFreeTrial;
+	}
+
+	public void setOrganizationFreeTrial(OrganizationFreeTrial organizationFreeTrial) {
+		this.organizationFreeTrial = organizationFreeTrial;
 	}
 
 	@Override

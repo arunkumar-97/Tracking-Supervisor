@@ -80,4 +80,6 @@ public class WorkPlaceServiceImpl implements WorkPlaceService{
 		return workPlaceRepository.findAllByAssignedToUserAndFromDateAndToDate(assignedToUser,fromDate,toDate);
 	}
 
+	
+
 }

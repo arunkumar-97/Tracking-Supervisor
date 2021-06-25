@@ -1,6 +1,7 @@
 package com.jesperapps.tracksupervisor.api.service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,12 @@ public class DoNotTrackServicelmpl implements DoNotTrackService {
 	public DoNotTrack findByUser_UserId(Long userId) {
 		// TODO Auto-generated method stub
 		return doNotTrackRepository.findByUser_UserId(userId);
+	}
+
+	@Override
+	public List<DoNotTrack> findAllByUser_UserId(Long userId) {
+		// TODO Auto-generated method stub
+		return doNotTrackRepository.findAllByUser_UserId(userId);
 	}
 
 //	@Override

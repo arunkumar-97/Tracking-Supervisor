@@ -202,8 +202,12 @@ public class OrganizationController {
 					user.setUserType(userType);
 					
 					int otp = otpService.generateOTP(eachUser.getPhoneNumber());
+					System.out.println("OTP "+ otp);
 					if (otp == 0) {
 					} else {
+						
+						System.out.println("authe" + user.getAuthenticationType());
+						System.out.println("phom" + user.getPhoneNumber());
 						if (user.getAuthenticationType().equalsIgnoreCase("sms")) {
 							sendSms("Your One Time Password(OTP) is " + otp, user.getPhoneNumber());
 
@@ -268,6 +272,29 @@ public class OrganizationController {
 //							organizationService.save(organization);
 //						}
 					}
+					
+					
+					OrganizationFreeTrial orgFreeTrial=new OrganizationFreeTrial();
+					orgFreeTrial.setOrganization(createdOrganization);
+					orgFreeTrial.setFreeTrial(organizationRequestEntity.getFreeTrial());
+					Date date=new Date();
+					orgFreeTrial.setStartDate(date);
+					if(organizationRequestEntity.getFreeTrial() != null) {
+						Optional<FreeTrial> freetrial=freeTrialService.findById(organizationRequestEntity.getFreeTrial().getFreeTrialId());
+						Integer noofdays = freetrial.get().getNoOfDays();
+						Date endate = new Date();
+						    endate.setDate(endate.getDate() + noofdays);
+						    orgFreeTrial.setEndDate(endate);
+						    
+						    
+						    
+						    System.out.println("StartDate :" + date);
+						    System.out.println("StartDate :" + endate);
+						    Status status=new Status();
+						    status.setStatusId((long) 1);
+						    orgFreeTrial.setStatus(status);  
+						    organizationFreeTrialService.save(orgFreeTrial);
+					}
 					}
 		                     
 						
@@ -296,9 +323,9 @@ public class OrganizationController {
 				
 			}else {
 				OrganizationResponseEntity userResEntity = new OrganizationResponseEntity();
-				userResEntity.setErrorCode(200);
+				userResEntity.setErrorCode(409);
 				userResEntity.setMessage("Organization Already Exists");
-				return new ResponseEntity(userResEntity, HttpStatus.OK);
+				return new ResponseEntity(userResEntity, HttpStatus.CONFLICT);
 		
 			}
 			
@@ -378,7 +405,7 @@ public class OrganizationController {
 						Authenticator auth = new Authenticator() {
 							protected PasswordAuthentication getPasswordAuthentication() {
 //								return new PasswordAuthentication(FROM_ADDRESS,"Jesper$2021");
-								return new PasswordAuthentication(FROM_ADDRESS,"Arun12345$");
+								return new PasswordAuthentication(FROM_ADDRESS,"Arun12345@");
 							}
 						};
 						Session session = Session.getInstance(props, auth);
@@ -633,6 +660,7 @@ public class OrganizationController {
 		Optional<Organization> organization = organizationService.findById(id);
 		if (organization.isPresent()) {
 			OrganizationResponseEntity organizationResponseEntity = new OrganizationResponseEntity(organization.get());
+		List<User> users=	organizationResponseEntity.getUser();
 			if (organizationResponseEntity.getAttachment() == null) {
 
 			} else {
@@ -706,6 +734,56 @@ public class OrganizationController {
 					     
 					     
 					  response.add(new OrganizationResponseEntity(Organization));
+				  }
+					
+				});
+				return  new ResponseEntity(response, HttpStatus.OK);
+		}
+	
+	
+	@GetMapping("/specific/organization")
+	private ResponseEntity getAllOrganizationsParticular() {
+			
+			List<OrganizationResponseEntity> response=new ArrayList<OrganizationResponseEntity>();
+			organizationService.findAll().forEach(Organization ->{
+				  if(Organization.getStatus() ==  null || Organization.getStatus().getStatusId() == 1||Organization.getStatus().getStatusId()==2) {
+					  
+					  if (Organization.getAttachment() == null) {
+
+						} else {
+							Attachment attachment = new Attachment(Organization.getAttachment(),
+									Organization.getAttachment());
+							if (attachment.getAttachmentByte() != null) {
+								AttachmentByte attachmentByte = new AttachmentByte(attachment.getAttachmentByte());
+								attachment.setAttachmentByte(attachmentByte);
+							}
+
+							Organization.setAttachment(attachment);
+						}
+					  
+					    if(Organization.getStatus()  == null)
+					    {
+					    	
+					    }else {
+					    	Status status = new Status(Organization.getStatus());
+					    	Organization.setStatus(status); 
+					    }
+//					    
+//					    List<User> responseuser=new ArrayList<>();
+//					 
+//					     for(User user : Organization.getUser())
+//
+//					    	 {
+//					    	 
+//					    	 User user1=new User(user,user);
+//					    	 responseuser.add(user1);
+//					    	 
+//					    	 }
+//					     
+//					     Organization.setUser(responseuser);
+					     
+					     
+					  response.add(new OrganizationResponseEntity(Organization,Organization));
 				  }
 					
 				});

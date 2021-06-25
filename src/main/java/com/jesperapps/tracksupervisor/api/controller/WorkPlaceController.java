@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jesperapps.tracksupervisor.api.entity.AttendanceResEntity;
 import com.jesperapps.tracksupervisor.api.message.AttendanceRequestEntity;
+import com.jesperapps.tracksupervisor.api.message.LocationDetailsResponseEntity;
 import com.jesperapps.tracksupervisor.api.message.WorkPlaceRequestEntity;
 import com.jesperapps.tracksupervisor.api.message.WorkPlaceResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.Address;
@@ -33,6 +34,8 @@ import com.jesperapps.tracksupervisor.api.model.WorkPlace;
 import com.jesperapps.tracksupervisor.api.model.WorkersCount;
 import com.jesperapps.tracksupervisor.api.repository.WorkPlaceRepository;
 import com.jesperapps.tracksupervisor.api.service.AddressService;
+import com.jesperapps.tracksupervisor.api.service.LocationDetailsService;
+import com.jesperapps.tracksupervisor.api.service.UserService;
 import com.jesperapps.tracksupervisor.api.service.WorkPlaceService;
 import com.jesperapps.tracksupervisor.api.service.WorkersCountService;
 
@@ -47,6 +50,216 @@ public class WorkPlaceController {
 
 	@Autowired
 	private WorkersCountService workersCountService;
+	
+	@Autowired
+	private LocationDetailsService locationDetailsService;
+	
+	@Autowired
+	private UserService userService;
+	
+	
+	@PostMapping("/instant/work-place")
+	public ResponseEntity createInstantWorkPlace(@RequestBody WorkPlaceRequestEntity workPlaceReqEntity) {
+		
+
+		if (workPlaceReqEntity.getFromDate() == null) {
+			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+			workPlaceResponseEntity.setErrorCode(400);
+			workPlaceResponseEntity.setMessage("FromDate can't be empty");
+			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+		}
+		if (workPlaceReqEntity.getToDate() == null) {
+			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+			workPlaceResponseEntity.setErrorCode(400);
+			workPlaceResponseEntity.setMessage("ToDate can't be empty");
+			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+		}
+//		if (workPlaceReqEntity.getAddress() == null || workPlaceReqEntity.getAddress().isEmpty()) {
+//			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//			workPlaceResponseEntity.setErrorCode(400);
+//			workPlaceResponseEntity.setMessage("Address can't be empty");
+//			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//		} else {
+//			for (Address address : workPlaceReqEntity.getAddress()) {
+//				if (address.getLatitude().equals(0.0)) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Latitude can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//				if (address.getLongitude().equals(0.0)) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Longitude can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//
+//				if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Address can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//			}
+//
+//		}
+	WorkPlace	workPlaceFromDb=workPlaceService.findByAssignedToUserAndFromDateAndToDate(workPlaceReqEntity.getAssignedToUser(),workPlaceReqEntity.getFromDate(),workPlaceReqEntity.getToDate());
+		if(workPlaceFromDb==null) {
+			Optional<User> assignedToUser = this.userService.findById(workPlaceReqEntity.getAssignedToUser().getUserId());
+			WorkPlace workPlace = new WorkPlace(workPlaceReqEntity);
+			
+		LocationDetails locdetails=	workPlaceReqEntity.getLocationDetails();
+		if(locdetails != null) {
+			LocationDetails ld=new LocationDetails(locdetails);
+			locationDetailsService.save(ld);
+			 workPlace.setLocationDetails(ld);
+		}
+		if(assignedToUser.isPresent()) {
+			User userFromDb = assignedToUser.get();
+			List<WorkPlace> workPlaceList = userFromDb.getWorkPlacee();
+			if(workPlaceList == null) {
+				workPlaceList = new ArrayList<WorkPlace>();
+			}
+			for(WorkPlace w : workPlaceList) {
+				System.out.print(w.getWorkPlaceId());
+			}
+			workPlaceList.add(workPlace);
+			userFromDb.setWorkPlacee(workPlaceList);
+			this.userService.save(userFromDb);
+		}
+			WorkPlace workPlaces = workPlaceService.save(workPlace);
+			if (workPlaces != null) {
+
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setStatusCode(200);
+				workPlaceResponseEntity.setErrorCode(null);
+				workPlaceResponseEntity.setDescription("WorkPlace Added Successfully");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.OK);
+			} else {
+				WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+				workPlaceResponseEntity.setErrorCode(400);
+				workPlaceResponseEntity.setMessage("Unable to add WorkPlace");
+				return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+			}
+		}else {
+			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+			workPlaceResponseEntity.setErrorCode(400);
+			workPlaceResponseEntity.setMessage("WorkPlace Already Assigned to the User");
+			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+		}
+		
+	}
+	
+	
+	@PostMapping("/multiple/instant/work-place")
+	public ResponseEntity createMultipleInstantWorkPlace(@RequestBody List<WorkPlaceRequestEntity> workPlaceReqEntity) {
+		WorkPlaceResponseEntity response=new WorkPlaceResponseEntity();
+		List<WorkPlaceResponseEntity> clas=new ArrayList<>();
+		LocationDetails locationDetails=new LocationDetails();;
+		LocationDetails locdetails=	workPlaceReqEntity.get(0).getLocationDetails();
+		if(locdetails != null) {
+			LocationDetails ld=new LocationDetails(locdetails);
+			 locationDetails	=locationDetailsService.save(ld);
+		}
+		
+		for(WorkPlaceRequestEntity each:workPlaceReqEntity) {
+			System.out.println(each.getFromDate());
+		if (each.getFromDate() == null) {
+			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+			workPlaceResponseEntity.setErrorCode(400);
+			workPlaceResponseEntity.setMessage("FromDate can't be empty");
+			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+		}
+		if (each.getToDate() == null) {
+			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+			workPlaceResponseEntity.setErrorCode(400);
+			workPlaceResponseEntity.setMessage("ToDate can't be empty");
+			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+		}
+//		if (workPlaceReqEntity.getAddress() == null || workPlaceReqEntity.getAddress().isEmpty()) {
+//			WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//			workPlaceResponseEntity.setErrorCode(400);
+//			workPlaceResponseEntity.setMessage("Address can't be empty");
+//			return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//		} else {
+//			for (Address address : workPlaceReqEntity.getAddress()) {
+//				if (address.getLatitude().equals(0.0)) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Latitude can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//				if (address.getLongitude().equals(0.0)) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Longitude can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//
+//				if (address.getAddressName() == null || address.getAddressName().isEmpty()) {
+//					WorkPlaceResponseEntity workPlaceResponseEntity = new WorkPlaceResponseEntity();
+//					workPlaceResponseEntity.setErrorCode(400);
+//					workPlaceResponseEntity.setMessage("Address can't be empty");
+//					return new ResponseEntity(workPlaceResponseEntity, HttpStatus.CONFLICT);
+//				}
+//			}
+//
+//		}
+	List<WorkPlace>	workPlaceFromDb=workPlaceService.findAllByAssignedToUserAndFromDateAndToDate(each.getAssignedToUser(),each.getFromDate(),each.getToDate());
+		if(workPlaceFromDb.isEmpty()) {
+			Optional<User> assignedToUser = this.userService.findById(each.getAssignedToUser().getUserId());
+
+			
+			WorkPlace workPlace = new WorkPlace(each);
+			workPlace.setLocationDetails(locationDetails);
+			if(assignedToUser.isPresent()) {
+				User userFromDb = assignedToUser.get();
+				List<WorkPlace> workPlaceList = userFromDb.getWorkPlacee();
+				if(workPlaceList == null) {
+					workPlaceList = new ArrayList<WorkPlace>();
+				}
+				for(WorkPlace w : workPlaceList) {
+					System.out.print(w.getWorkPlaceId());
+				}
+				workPlaceList.add(workPlace);
+				userFromDb.setWorkPlacee(workPlaceList);
+				this.userService.save(userFromDb);
+			}
+			WorkPlace workPlaces = workPlaceService.save(workPlace);
+
+		}else {
+//			System.out.println("checking else");
+					WorkPlaceResponseEntity res=new WorkPlaceResponseEntity(workPlaceFromDb.get(0));	
+//					System.out.println("RESPONSE" +res.getSchoolEducationBoard());
+					   clas.add(res);
+				
+			}
+		}
+		
+		
+		if(clas.isEmpty()) {
+			response.setStatusCode(200);
+			response.setDescription("Successfully Created");
+			return new ResponseEntity(response, HttpStatus.OK);
+		}else {
+			 String descrption = null;
+			 for(WorkPlaceResponseEntity cl :  clas)
+			 {     
+//				 System.out.println("Before");
+				 if(descrption != null) 
+				 {
+//					 System.out.println("if");
+					 descrption = descrption +","+ cl.getAssignedToUser().getName();
+				 }else {
+					 descrption =   cl.getAssignedToUser().getName();
+				 }
+				 System.out.println("Description "+ descrption);
+			 }
+			response.setStatusCode(409);
+			response.setDescription(descrption +" " +"workplace  is Already Assigned for the User");
+			return new ResponseEntity(response, HttpStatus.CONFLICT);
+		}
+	}
 
 	@PostMapping("/work-place")
 	public ResponseEntity createWorkPlace(@RequestBody WorkPlaceRequestEntity workPlaceReqEntity) {
@@ -276,28 +489,30 @@ public class WorkPlaceController {
 						|| workPlace1.getStatus().getStatusName().equals("InActive")
 						|| workPlace1.getStatus().getStatusName().equals("Pending")) {
 					WorkPlaceResponseEntity workPlaceData = new WorkPlaceResponseEntity(workPlace1);
-					User assignedFromUsr = new User(workPlaceData.getAssignedFromUser());
+					User assignedFromUsr = new User(workPlaceData.getAssignedFromUser(),workPlaceData.getAssignedFromUser());
 					workPlaceData.setAssignedFromUser(assignedFromUsr);
-					User assignedToUsr = new User(workPlaceData.getAssignedToUser());
+					User assignedToUsr = new User(workPlaceData.getAssignedToUser(),workPlaceData.getAssignedToUser());
 					workPlaceData.setAssignedToUser(assignedToUsr);
 					Status status = new Status(workPlaceData.getStatus());
 					workPlaceData.setStatus(status);
-					List<Address> addresses = new ArrayList<Address>();
-					for (Address a : workPlaceData.getAddress()) {
-						Address address = new Address(a);
-						if (address.getWorkersCount() != null) {
-							List<WorkersCount> workersCount = new ArrayList<WorkersCount>();
-							for (WorkersCount wc : address.getWorkersCount()) {
-								WorkersCount workerCount = new WorkersCount(wc);
-								workersCount.add(workerCount);
-							}
-
-							address.setWorkersCount(workersCount);
-						}
-
-						addresses.add(address);
-					}
-					workPlaceData.setAddress(addresses);
+					LocationDetails locationDetails=new LocationDetails(workPlaceData.getLocationDetails(),workPlaceData.getLocationDetails());
+					workPlaceData.setLocationDetails(locationDetails);
+//					List<Address> addresses = new ArrayList<Address>();
+//					for (Address a : workPlaceData.getAddress()) {
+//						Address address = new Address(a);
+//						if (address.getWorkersCount() != null) {
+//							List<WorkersCount> workersCount = new ArrayList<WorkersCount>();
+//							for (WorkersCount wc : address.getWorkersCount()) {
+//								WorkersCount workerCount = new WorkersCount(wc);
+//								workersCount.add(workerCount);
+//							}
+//
+//							address.setWorkersCount(workersCount);
+//						}
+//
+//						addresses.add(address);
+//					}
+//					workPlaceData.setAddress(addresses);
 					workPlaceResponseEntity1.add(workPlaceData);
 				}
 			}
@@ -378,4 +593,37 @@ public class WorkPlaceController {
 		}
 //		return null;
 	}
+	
+	@GetMapping("/work-place/user/{fromDate}/{toDate}/{assignedToUserId}")
+	public List<WorkPlaceResponseEntity> getClassSubjects(@PathVariable("fromDate") Date fromDate,
+			@PathVariable("toDate") Date toDate,@PathVariable Long assignedToUserId){
+		
+		List<WorkPlaceResponseEntity> List= new ArrayList<>();
+	User user=new User(assignedToUserId,assignedToUserId);
+		List<WorkPlace> worjkplaceList = workPlaceService.findAllByAssignedToUserAndFromDateAndToDate(user , fromDate , toDate);
+		
+//		if(worjkplaceList != null) {
+//			System.out.println(requestUser.getWorkPlace());
+//			requestUser.getWorkPlace().forEach(location -> {
+		for(WorkPlace w:worjkplaceList) {
+			WorkPlaceResponseEntity locationDetailsResponseEntity=	new WorkPlaceResponseEntity(w);
+			
+			User u=new User(locationDetailsResponseEntity.getAssignedFromUser(),locationDetailsResponseEntity.getAssignedFromUser());
+			locationDetailsResponseEntity.setAssignedFromUser(u);
+			User u1=new User(locationDetailsResponseEntity.getAssignedToUser(),locationDetailsResponseEntity.getAssignedToUser());
+			locationDetailsResponseEntity.setAssignedToUser(u1);
+			LocationDetails ll= new LocationDetails(locationDetailsResponseEntity.getLocationDetails(),locationDetailsResponseEntity.getLocationDetails());
+			locationDetailsResponseEntity.setLocationDetails(ll);
+			List.add(locationDetailsResponseEntity);
+		}
+				
+				
+			
+//			});
+		
+//		}
+		return (List);
+		
+	}
+	
 }

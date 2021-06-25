@@ -20,15 +20,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.TextMessage;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.jesperapps.tracksupervisor.api.extra.Response;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrackRequestingEntity;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrakResponseEntity;
+import com.jesperapps.tracksupervisor.api.message.FreeTrialResEntity;
+import com.jesperapps.tracksupervisor.api.message.LocationDetailsResponseEntity;
 import com.jesperapps.tracksupervisor.api.model.ApprovalStatus;
 import com.jesperapps.tracksupervisor.api.model.DoNotTrack;
 import com.jesperapps.tracksupervisor.api.model.DoNotTrackSubscribers;
+import com.jesperapps.tracksupervisor.api.model.FreeTrial;
 import com.jesperapps.tracksupervisor.api.model.SecondaryUser;
 import com.jesperapps.tracksupervisor.api.model.User;
 import com.jesperapps.tracksupervisor.api.service.DoNotTrackService;
@@ -58,59 +64,104 @@ public class DoNotTrackController {
 	@Autowired
 	private SecondaryUserService secondaryUserService;
 	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	private String sendPushNotification(User primaryUser, User UserFromDb, DoNotTrack doNotTrack) {
+		if(primaryUser != null) {
+			DoNotTrackSubscribers sub = primaryUser.getDoNotTrackSubscribers();
+			if(sub != null) {
+				//post notification to sub id
+				try {
+					ObjectMapper jsonConverter = new ObjectMapper();
+					this.firebaseService.getMessaging()
+					.send(
+							Message.builder()
+							.setToken(sub.getSubscriptionId())
+							
+							.setNotification(
+									Notification.builder()
+									.setTitle(UserFromDb.getName()+" has requested to don't track")
+									
+//									.setBody(UserFromDb.getUserId() + "-Employee Id has enabled DoNotTrack feature")
+									.setBody("From " + doNotTrack.getFromDate()+" to "+ doNotTrack.getToDate())
+									.build()
+								)
+							.putData("data", jsonConverter.writeValueAsString(doNotTrack))
+							.build()
+						);
+					return "";
+				} catch (FirebaseMessagingException | JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					//error sending firebase push notification
+					//e.printStackTrace();
+					return e.getLocalizedMessage();
+				}
+			}else {
+				//no sub found;
+				return "No sub found";
+			}
+		}
+		return "No User found";
+	}
 	
 	
 	@PostMapping("/track")
 	public Response createDoNotTrackfromRequest(@RequestBody DoNotTrackRequestingEntity reqEntity) { 
 		
-		Response response=new Response();
+		Response response=new Response(200,"Do Not Track successfully Applied");
 		User requestUser = reqEntity.getUser();
 		if(requestUser != null) {
 		User	UserFromDb =this.userService.findByUserId(requestUser.getUserId());
 			if(UserFromDb != null) {
 				SecondaryUser secondaryUserFromDb = this.secondaryUserService.findBySecondaryUser(UserFromDb);
 			User primaryUser =secondaryUserFromDb != null ? secondaryUserFromDb.getPrimaryUser() :null;
-			if(primaryUser != null) {
-				DoNotTrackSubscribers sub = primaryUser.getDoNotTrackSubscribers();
-				if(sub != null) {
-					//post notification to sub id
-					try {
-						this.firebaseService.getMessaging()
-						.send(
-								Message.builder()
-								.setToken(sub.getSubscriptionId())
-								.setNotification(
-										Notification.builder()
-										.setTitle(UserFromDb.getName()+"has request to don't track")
-//										.setBody(UserFromDb.getUserId() + "-Employee Id has enabled DoNotTrack feature")
-										.setBody(reqEntity.getFromDate()+" to "+ reqEntity.getToDate()+" has enabled DoNotTrack feature")
-										.build()
-									)
-								.build()
-							);
-					} catch (FirebaseMessagingException e) {
-						// TODO Auto-generated catch block
-						//error sending firebase push notification
-						//e.printStackTrace();
-						response.setStatusCode(409);
-						response.setDescription(e.getMessage());
-						return response;
-					}
-				}else {
-					//no sub found
-					response.setDescription("No subscription found");
-					response.setStatusCode(409);
-					return response;
-				}
-			}
+//			if(primaryUser != null) {
+//				DoNotTrackSubscribers sub = primaryUser.getDoNotTrackSubscribers();
+//				if(sub != null) {
+//					//post notification to sub id
+//					try {
+//						ObjectMapper jsonConverter = new ObjectMapper();
+//						this.firebaseService.getMessaging()
+//						.send(
+//								Message.builder()
+//								.setToken(sub.getSubscriptionId())
+//								
+//								.setNotification(
+//										Notification.builder()
+//										.setTitle(UserFromDb.getName()+"has requested to don't track")
+//										
+////										.setBody(UserFromDb.getUserId() + "-Employee Id has enabled DoNotTrack feature")
+//										.setBody("From" + reqEntity.getFromDate()+" to "+ reqEntity.getToDate()+" has requested DoNotTrack")
+//										.build()
+//									)
+//								.putData("data", jsonConverter.writeValueAsString(new DoNotTrack(reqEntity)))
+//								.build()
+//							);
+//					} catch (FirebaseMessagingException | JsonProcessingException e) {
+//						// TODO Auto-generated catch block
+//						//error sending firebase push notification
+//						//e.printStackTrace();
+//						response.setStatusCode(409);
+//						response.setDescription(e.getMessage());
+//						return response;
+//					}
+//				}else {
+//					//no sub found
+//					response.setDescription("No subscription found");
+//					response.setStatusCode(409);
+//					return response;
+//				}
+//			}
 		DoNotTrack trackFromDb=doNotTrackService.findByUser_userIdAndFromDateAndToDate(reqEntity.getUser().getUserId(),reqEntity.getFromDate(),reqEntity.getToDate());
 				if(trackFromDb != null) {
 					
 					if(trackFromDb.getApprovalstatus().getApprovalStatusId()== 3 ) {
 						DoNotTrack doNotTrack=new DoNotTrack(reqEntity);
 						doNotTrackService.save(doNotTrack);
-						response.setStatusCode(200);
-						response.setDescription("Created Successfully");
+						String pushNotificationSent = this.sendPushNotification(primaryUser, UserFromDb, doNotTrack);
+						response.setStatusCode(pushNotificationSent.length() > 0 ? 409 : 200);
+						response.setDescription(pushNotificationSent.length() > 0 ? pushNotificationSent: "Created Successfully");
 						return response;
 					}else{
 						Response response1=new Response(409,"Do Not Track Request Already Applied");
@@ -120,8 +171,9 @@ public class DoNotTrackController {
 				}else {
 					DoNotTrack doNotTrack=new DoNotTrack(reqEntity);
 					doNotTrackService.save(doNotTrack);
-					response.setStatusCode(200);
-					response.setDescription("Created Successfully");
+					String pushNotificationSent = this.sendPushNotification(primaryUser, UserFromDb, doNotTrack);
+					response.setStatusCode(pushNotificationSent.length() > 0 ? 409 : 200);
+					response.setDescription(pushNotificationSent.length() > 0 ? pushNotificationSent: "Created Successfully");
 					return response;
 				}
 //				return response;
@@ -189,8 +241,29 @@ public class DoNotTrackController {
 			return response;
 	}
 	
-	
 	@GetMapping("/track/{trackId}")
+	public ResponseEntity<Optional<DoNotTrakResponseEntity>> getDoNotTrakResponseEntity(@PathVariable("trackId") Integer trackId) {
+		DoNotTrack doNotTrackFromDb=doNotTrackService.findByTrackId(trackId);
+		if (doNotTrackFromDb != null) {
+			DoNotTrakResponseEntity freeTrialResponseEntity = new DoNotTrakResponseEntity(doNotTrackFromDb);
+		User user=	doNotTrackFromDb.getUser();
+		User users=new User(user,user);
+		freeTrialResponseEntity.setUser(users);	
+			 
+			
+			return new ResponseEntity<Optional<DoNotTrakResponseEntity>>(Optional.of(freeTrialResponseEntity), HttpStatus.OK);
+		} else {
+			ObjectNode jsonObject = objectMapper.createObjectNode();
+			LocationDetailsResponseEntity res=new LocationDetailsResponseEntity();
+			jsonObject.put("statusCode", res.setStatusCode(404));
+			jsonObject.put("message", res.setDescription("Track with id =" + trackId + " not found"));
+			return new ResponseEntity(jsonObject, HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	
+	
+//	@GetMapping("/track/{trackId}")
 	public ResponseEntity viewUser(@PathVariable int trackId)
 	{
 		DoNotTrack doNotTrackFromDb=doNotTrackService.findByTrackId(trackId);
@@ -285,18 +358,20 @@ public class DoNotTrackController {
 		for(SecondaryUser u : listOfSecondaryUserFromDb) {
 			User secondaryUser = u.getSecondaryUser();
 			if(secondaryUser != null) {
-				DoNotTrack secondaryUserWithDoNotTrack = this.doNotTrackService.findByUser_UserId(secondaryUser.getUserId());
-				 
-				if(secondaryUserWithDoNotTrack != null) {
-					DoNotTrack userr=new DoNotTrack(secondaryUserWithDoNotTrack,secondaryUserWithDoNotTrack,secondaryUserWithDoNotTrack);
-					
-					   User usern = new User(userr.getUser() , userr.getUser());
-					   userr.setUser(usern);
-					      
-					response.add(new DoNotTrakResponseEntity( userr));
-//					return new ResponseEntity(secondaryUserWithDoNotTrackList, HttpStatus.OK);
+				List<DoNotTrack> secondaryUserWithDoNotTrack = this.doNotTrackService.findAllByUser_UserId(secondaryUser.getUserId());
+				 for(DoNotTrack eaachsecondaryUserWithDoNotTrack:secondaryUserWithDoNotTrack) {
+					 if(secondaryUserWithDoNotTrack != null) {
+							DoNotTrack userr=new DoNotTrack(eaachsecondaryUserWithDoNotTrack,eaachsecondaryUserWithDoNotTrack,eaachsecondaryUserWithDoNotTrack);
+							
+							   User usern = new User(userr.getUser() , userr.getUser());
+							   userr.setUser(usern);
+							      
+							response.add(new DoNotTrakResponseEntity(userr));
+//							return new ResponseEntity(secondaryUserWithDoNotTrackList, HttpStatus.OK);
+						
+						}
+				 }
 				
-				}
 				
 				if (response.isEmpty()) {
 					DoNotTrakResponseEntity userResponseEntity = new DoNotTrakResponseEntity();

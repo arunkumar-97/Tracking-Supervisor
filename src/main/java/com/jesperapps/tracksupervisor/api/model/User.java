@@ -168,6 +168,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.name = userRequestEntity.getName();
 		this.phoneNumber = userRequestEntity.getPhoneNumber();
 		this.email = userRequestEntity.getEmail();
+		
 		this.alternatePhoneNumber = userRequestEntity.getAlternatePhoneNumber();
 		this.userType = userRequestEntity.getUserType();
 		if (userRequestEntity.getAttachment() == null) {
@@ -465,6 +466,64 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		
 		this.organization = userRequestEntity.getOrganization();
 	}
+
+	public User(Optional<User> userDatas, UserRequestEntity userRequestEntity, UserRequestEntity userRequestEntity2) {
+		this.userId = userRequestEntity.getUserId();
+		this.name = userRequestEntity.getName();
+		this.phoneNumber = userRequestEntity.getPhoneNumber();
+		this.email = userRequestEntity.getEmail();
+		this.password=userDatas.get().getPassword();
+		this.alternatePhoneNumber = userDatas.get().getAlternatePhoneNumber();
+		this.address=userDatas.get().getAddress();
+		this.postalCode=userDatas.get().getPostalCode();
+		this.authenticationType=userDatas.get().getAuthenticationType();
+		this.userType = userRequestEntity.getUserType();
+		this.country=userDatas.get().getCountry();
+		this.states=userDatas.get().getStates();
+		this.city=userDatas.get().getCity();
+		if (userDatas.get().getAttachment() == null) {
+
+		} else {
+			this.attachment = userDatas.get().getAttachment();
+			this.attachment.setUser(this);
+		}
+		this.createdByUser = userRequestEntity.getCreatedByUser();
+//		this.timeTracking = userDatas.get().getTimeTracking();
+//		if(userRequestEntity.getTimeTracking() != null) {
+//			this.timeTracking.forEach(x -> x.setUser(this));
+//		}
+		
+		this.organization = userDatas.get().getOrganization();
+		}
+
+	public User(User user, UserRequestEntity userRequestEntity, UserRequestEntity userRequestEntity2) {
+		this.userId = userRequestEntity.getUserId();
+		this.name = userRequestEntity.getName();
+		this.phoneNumber = userRequestEntity.getPhoneNumber();
+		this.email = userRequestEntity.getEmail();
+		this.password=user.getPassword();
+		this.alternatePhoneNumber = user.getAlternatePhoneNumber();
+		this.address=user.getAddress();
+		this.postalCode=user.getPostalCode();
+		this.authenticationType=user.getAuthenticationType();
+		this.userType = userRequestEntity.getUserType();
+		this.country=user.getCountry();
+		this.states=user.getStates();
+		this.city=user.getCity();
+		if (user.getAttachment() == null) {
+
+		} else {
+			this.attachment = user.getAttachment();
+			this.attachment.setUser(this);
+		}
+		this.createdByUser = userRequestEntity.getCreatedByUser();
+//		this.timeTracking = userDatas.get().getTimeTracking();
+//		if(userRequestEntity.getTimeTracking() != null) {
+//			this.timeTracking.forEach(x -> x.setUser(this));
+//		}
+		
+		this.organization = user.getOrganization();	
+		}
 
 	public ConfirmationToken getOtpToken() {
 		return otpToken;

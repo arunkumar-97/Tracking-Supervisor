@@ -50,7 +50,7 @@ public class OtpSmsController {
 		if (otp >= 0) {
  
 //			otpSmsService.clearOTP(phoneNumber);
-			Optional<OtpSms> Otp = otpSmsService.getOtp(phoneNumber);
+			OtpSms Otp = otpSmsService.getOtp(phoneNumber);
 			System.out.println("otp  :" + Otp );
 			if (Otp == null) {
 //				ObjectNode jsonObject = objectMapper.createObjectNode();
@@ -58,11 +58,11 @@ public class OtpSmsController {
 //				jsonObject.put("message", res.setDescription("Otp not found"));
 //				return new ResponseEntity(jsonObject, HttpStatus.BAD_REQUEST);
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(409,"Otp not found"));
-			} else if (Otp.get().getOtp() > 0) {
-				if (otp == Otp.get().getOtp()) {
+			} else if (Otp.getOtp() > 0) {
+				if (otp == Otp.getOtp()) {
 					try {
-						if (format.parse(otpValidationTime).getTime() - format.parse(Otp.get().getOtpGenerationTime())
-								.getTime() < TimeUnit.MINUTES.toMillis(Otp.get().getExpireMins())) {
+						if (format.parse(otpValidationTime).getTime() - format.parse(Otp.getOtpGenerationTime())
+								.getTime() < TimeUnit.MINUTES.toMillis(Otp.getExpireMins())) {
 							otpSmsService.clearOTP(phoneNumber);
 
 						} else {
@@ -145,11 +145,12 @@ public class OtpSmsController {
 //		System.out.println("phoneNumbers" + phoneNumber);
 		if (phoneNumber != null) {
 //			System.out.println("phone present");
-				List<OtpSms> otpSms = otpSmsService.findAll();
-				if (otpSms.isEmpty()) {
-//					System.out.println("otp empty");
+				OtpSms otpSms = otpSmsService.findByPhoneNumber(phone);
+				if (otpSms== null) {
+					System.out.println("otp empty");
 //					otpSmsService.clearOTP(phoneNumber);
 					int otp = otpSmsService.generateOTP(phoneNumber.getPhoneNumber());
+					System.out.println("otp "+ otp);
 					if (otp == 0) {
 //						ObjectNode jsonObject = objectMapper.createObjectNode();
 //						jsonObject.put("statusCode", res.FAILURE);
@@ -184,8 +185,9 @@ public class OtpSmsController {
 					}
 				} else {
 					System.out.println("else otp empty");
-					otpSmsService.clearOTP(phone);
+//					otpSmsService.clearOTP(phone);
 					int otp = otpSmsService.generateOTP(phoneNumber.getPhoneNumber());
+					System.out.println(otp);
 					if (otp == 0) {
 //						ObjectNode jsonObject = objectMapper.createObjectNode();
 //						jsonObject.put("statusCode", res.FAILURE);

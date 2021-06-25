@@ -256,7 +256,8 @@ public class LocationDetailsController {
 		if (locationDetails.isPresent()) {
 			LocationDetailsResponseEntity organizationResponseEntity = new LocationDetailsResponseEntity(locationDetails.get());
 			
-			
+			User u=new User(organizationResponseEntity.getUser(),organizationResponseEntity.getUser());
+			organizationResponseEntity.setUser(u);
 			 
 			
 			return new ResponseEntity<Optional<LocationDetailsResponseEntity>>(Optional.of(organizationResponseEntity), HttpStatus.OK);
