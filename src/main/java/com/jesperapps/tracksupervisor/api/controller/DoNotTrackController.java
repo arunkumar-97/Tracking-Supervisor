@@ -1,11 +1,14 @@
 package com.jesperapps.tracksupervisor.api.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,15 @@ import org.springframework.web.socket.TextMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
@@ -31,6 +43,7 @@ import com.jesperapps.tracksupervisor.api.message.DoNotTrackRequestingEntity;
 import com.jesperapps.tracksupervisor.api.message.DoNotTrakResponseEntity;
 import com.jesperapps.tracksupervisor.api.message.FreeTrialResEntity;
 import com.jesperapps.tracksupervisor.api.message.LocationDetailsResponseEntity;
+import com.jesperapps.tracksupervisor.api.message.PrimaryUserNotification;
 import com.jesperapps.tracksupervisor.api.model.ApprovalStatus;
 import com.jesperapps.tracksupervisor.api.model.DoNotTrack;
 import com.jesperapps.tracksupervisor.api.model.DoNotTrackSubscribers;
@@ -49,6 +62,9 @@ public class DoNotTrackController {
 	
 	@Autowired
 	private DoNotTrackService doNotTrackService;
+	
+	private final String COL_NAME = "primary_user",
+			KEY_NAME = "notifications";
 	
 	@Autowired
 	private UserService userService;
@@ -73,7 +89,7 @@ public class DoNotTrackController {
 			if(sub != null) {
 				//post notification to sub id
 				try {
-					ObjectMapper jsonConverter = new ObjectMapper();
+					PrimaryUserNotification not = new PrimaryUserNotification(primaryUser, UserFromDb, doNotTrack);
 					this.firebaseService.getMessaging()
 					.send(
 							Message.builder()
@@ -81,17 +97,33 @@ public class DoNotTrackController {
 							
 							.setNotification(
 									Notification.builder()
-									.setTitle(UserFromDb.getName()+" has requested to don't track")
+									.setTitle(not.getTitle())
 									
 //									.setBody(UserFromDb.getUserId() + "-Employee Id has enabled DoNotTrack feature")
-									.setBody("From " + doNotTrack.getFromDate()+" to "+ doNotTrack.getToDate())
+									.setBody(not.getBody())
 									.build()
 								)
-							.putData("data", jsonConverter.writeValueAsString(doNotTrack))
+							.putData("data", not.getData())
 							.build()
 						);
+					
+
+					Firestore fireStore = FirestoreClient.getFirestore();
+					List<PrimaryUserNotification> notsFromDb = null;
+					DocumentReference pUserNotificationDbRef = fireStore.collection(COL_NAME).document(sub.getSubscriptionId());
+					DocumentSnapshot pUserDocFromDb = pUserNotificationDbRef.get().get();
+					if(pUserDocFromDb.exists()) {
+						notsFromDb = (List<PrimaryUserNotification>) pUserDocFromDb.get(this.KEY_NAME);
+					}else {
+						notsFromDb = new ArrayList<PrimaryUserNotification>();
+					}
+					notsFromDb.add(not);
+					Map<String, List<PrimaryUserNotification>> map = new HashMap<>();
+					map.put(this.KEY_NAME, notsFromDb);
+					pUserNotificationDbRef.set(map);
 					return "";
-				} catch (FirebaseMessagingException | JsonProcessingException e) {
+				} catch (Exception e) {
+//					FirebaseMessagingException | JsonProcessingException e
 					// TODO Auto-generated catch block
 					//error sending firebase push notification
 					//e.printStackTrace();
@@ -449,5 +481,22 @@ public class DoNotTrackController {
 
 	}
 
-	
+	@GetMapping("/notifications/{userId}")
+	public List<PrimaryUserNotification> getNotificationsByPrimaryUser(@PathVariable Long userId) throws InterruptedException, ExecutionException {
+//		List<DoNotTrakResponseEntity> response = new ArrayList<>();
+		User primaryUserFromDb = userService.findByUserId(userId);
+		DoNotTrackSubscribers sub = primaryUserFromDb.getDoNotTrackSubscribers();
+		Firestore fireStore = FirestoreClient.getFirestore();
+		List<PrimaryUserNotification> notsFromDb = null;
+		DocumentReference pUserNotificationDbRef = fireStore.collection(COL_NAME).document(sub.getSubscriptionId());
+		DocumentSnapshot pUserDocFromDb = pUserNotificationDbRef.get().get();
+		if(pUserDocFromDb.exists()) {
+			notsFromDb = (List<PrimaryUserNotification>) pUserDocFromDb.get(this.KEY_NAME);
+			
+		}else {
+			notsFromDb = new ArrayList<PrimaryUserNotification>();
+			
+		}
+		return notsFromDb;
+	}
 }
